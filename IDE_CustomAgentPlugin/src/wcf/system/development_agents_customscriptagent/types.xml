@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<types xmlns="urn:quest-com:wcf-types-3-0">
+    <type name="ASPContainer" extends="wcf:WritableDataObject">
+        <property name="aspGroups" type="ASPGroup" is-many="true"/>
+        <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+xml.properties(""){
+
+	object.get("aspGroups",null).each { p-> writer << p.get("xml",null)
+	}
+}
+return writer.toString()]]></set>
+        </property>
+    </type>
+    <type name="ASPGroup" extends="ASPObject">
+        <property name="properties" type="ASPProperty" is-many="true"/>
+        <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+	def s = ""
+	object.get("properties",null).each { p-> s +=p.get("xml",null)
+	s+= "\n" 
+	}
+
+
+
+xml.group(
+	id:object.get("id",null),
+	label:object.get("label",null),''){
+	writer << s
+	}
+return writer.toString()]]></set>
+        </property>
+    </type>
+    <type name="ASPObject" extends="wcf:WritableDataObject">
+        <property name="id" type="wcf:String">
+            <set annotation="identity"/>
+        </property>
+        <property name="label" type="wcf:String"/>
+        <property name="pos" type="wcf:Number"/>
+        <property name="xml" type="wcf:String"/>
+    </type>
+    <type name="ASPProperty" extends="ASPObject">
+        <property name="xml" type="wcf:String"/>
+        <property name="default" type="wcf:String"/>
+        <property name="encrypted" type="wcf:Boolean">
+            <default>false</default>
+        </property>
+        <property name="renderInline" type="wcf:Boolean">
+            <default>false</default>
+        </property>
+        <property name="hidden" type="wcf:Boolean">
+            <default>false</default>
+        </property>
+        <property name="canBeBlank" type="wcf:Boolean">
+            <default/>
+        </property>
+    </type>
+    <type name="EnumValue" extends="ASPObject">
+        <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+xml.const(
+	id:object.get("id",null),
+	label:object.get("label",null),
+)
+
+return writer.toString()]]></set>
+        </property>
+    </type>
+    <type name="PropBoolean" extends="SecondaryASPProperty">
+        <property name="default" type="wcf:Boolean"/>
+        <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+xml.boolean(
+	id:object.get("id",null),
+	label:object.get("label",null),
+ 	renderInline:object.get("renderInline",null),
+	canBeBlank:object.get("canBeBlank",null),
+	default:object.get("default",null),
+	encrypted:object.get("encrypted",null),
+	hidden:object.get("hidden",null),
+)
+
+return writer.toString()]]></set>
+        </property>
+    </type>
+    <type name="PropEnum" extends="SecondaryASPProperty">
+        <property name="enums" type="EnumValue" is-many="true"/>
+        <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+	def s = ""
+	object.get("enums",null).each { p-> s +=p.get("xml",null)
+	s+= "\n" 
+	}
+
+xml.enum(
+	id:object.get("id",null),
+	label:object.get("label",null),
+ 	renderInline:object.get("renderInline",null),
+	canBeBlank:object.get("canBeBlank",null),
+	default:object.get("default",null),
+	hidden:object.get("hidden",null),''){
+	writer << s
+	}
+return writer.toString()]]></set>
+        </property>
+    </type>
+    <type name="PropFloat" extends="PropNumeric">
+        <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+xml.float(
+	id:object.get("id",null),
+	label:object.get("label",null),
+ 	renderInline:object.get("renderInline",null),
+	canBeBlank:object.get("canBeBlank",null),
+	default:object.get("default",null),
+	encrypted:object.get("encrypted",null),
+	hidden:object.get("hidden",null),
+	// specific Props following
+	equalZero:object.get("equalZero",null),
+	gtEqualZero:object.get("gtEqualZero",null),
+	ltEqualZero:object.get("ltEqualZero",null),
+	notEqualZero:object.get("notEqualZero",null)
+)
+
+return writer.toString()]]></set>
+        </property>
+        <property name="default" type="wcf:Double"/>
+    </type>
+    <type name="PropInteger" extends="PropNumeric">
+        <property name="default" type="wcf:Integer"/>
+        <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+xml.integer(
+	id:object.get("id",null),
+	label:object.get("label",null),
+ 	renderInline:object.get("renderInline",null),
+	canBeBlank:object.get("canBeBlank",null),
+	default:object.get("default",null),
+	encrypted:object.get("encrypted",null),
+	hidden:object.get("hidden",null),
+	// specific Props following
+	equalZero:object.get("equalZero",null),
+	gtEqualZero:object.get("gtEqualZero",null),
+	ltEqualZero:object.get("ltEqualZero",null),
+	notEqualZero:object.get("notEqualZero",null)
+)
+
+return writer.toString()]]></set>
+        </property>
+    </type>
+    <type name="PropNumeric" extends="SecondaryASPProperty">
+        <property name="ltEqualZero" type="wcf:Boolean"/>
+        <property name="equalZero" type="wcf:Boolean"/>
+        <property name="gtEqualZero" type="wcf:Boolean"/>
+        <property name="notEqualZero" type="wcf:Boolean"/>
+    </type>
+    <type name="PropSecondaryASP" extends="ASPProperty">
+        <property name="cols" type="SecondaryASPProperty" is-many="true"/>
+        <property name="size" type="wcf:Integer">
+            <default>16</default>
+        </property>
+        <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+	def s = ""
+	object.get("cols",null).each { p-> s +=p.get("xml",null)
+	s+= "\n" 
+	}
+
+xml.secondary(
+	size:object.get("size",null),
+	id:object.get("id",null),
+	label:object.get("label",null),
+ 	renderInline:object.get("renderInline",null),
+	canBeBlank:object.get("canBeBlank",null),
+	encrypted:object.get("encrypted",null),
+hidden:object.get("hidden",null)
+){ xml.cols('') {
+	writer << s
+	}
+	}
+return writer.toString()]]></set>
+        </property>
+    </type>
+    <type name="PropString" extends="SecondaryASPProperty">
+        <property name="size" type="wcf:Integer"/>
+        <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+xml.string(
+	size:object.get("size",null),
+	id:object.get("id",null),
+	label:object.get("label",null),
+ 	renderInline:object.get("renderInline",null),
+	canBeBlank:object.get("canBeBlank",null),
+	default:object.get("default",null),
+	encrypted:object.get("encrypted",null),
+hidden:object.get("hidden",null)
+)
+
+return writer.toString()]]></set>
+        </property>
+    </type>
+    <type name="SecondaryASPProperty" extends="ASPProperty">
+        <property name="xml" type="wcf:String"/>
+    </type>
+    <type name="TEST" extends="wcf:WritableDataObject">
+        <property name="name" type="wcf:Object"/>
+    </type>
+</types>

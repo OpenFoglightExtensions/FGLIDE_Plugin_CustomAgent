@@ -1,0 +1,125 @@
+		<property name="packageName" value="@@PACKAGE_NAME@@" />
+		<property name="installerOutput" value="${basedir}/build/agents/${agentname}/installers/${packageName}" />
+		<property name="agentOutput" value="${installerOutput}/${agentname}/${cartridge.version}/" />
+
+		<!-- Generate BasePgk -->
+		<mkdir dir="${installerOutput}/spid/5.2.4/deploy" />
+
+		<mkdir dir="${agentOutput}/bin" />
+		<touch file="${agentOutput}/bin/placeholder.file" />
+
+		<mkdir dir="${agentOutput}/export" />
+		<touch file="${agentOutput}/export/placeholder.file" />
+
+		<mkdir dir="${agentOutput}/lib" />
+		<touch file="${agentOutput}/lib/placeholder.file" />
+
+		<mkdir dir="${agentOutput}/logs" />
+		<touch file="${agentOutput}/logs/placeholder.file" />
+
+		<mkdir dir="${agentOutput}/messages" />
+		<touch file="${agentOutput}/messages/placeholder.file" />
+
+		<mkdir dir="${agentOutput}/mof" />
+		<touch file="${agentOutput}/mof/placeholder.file" />
+
+		<mkdir dir="${agentOutput}/World" />
+		<touch file="${agentOutput}/World/placeholder.file" />
+
+
+		<mkdir dir="${agentOutput}/script" />
+		<mkdir dir="${agentOutput}/config/${agentname}" />
+
+		<!-- Copy Config Defs -->
+		<copy file="${outputdir}/ConfigDefs.xml" todir="${agentOutput}/config/${agentname}" />
+		<copy todir="${agentOutput}/script">
+			<fileset dir="${basedir}/src/agents/${agentname}/${packageName}/scripts" includes="**/*" />
+		</copy>
+
+		<groovy>
+			<![CDATA[
+			def agentName = properties["agentname"]
+			def version = properties["cartridge.version"]
+			
+			println "Generate Installer Files for Agent " + agentName
+			def f = new File(properties.get("installerOutput")+"/spid/5.2.4/deploy/${agentName}BasePkg.xml")
+			f.withWriter { wrt ->
+				wrt << """\
+<?xml version="1.0" encoding="UTF-8"?>
+<BasePackage:package xmlns:BasePackage="http://www.quest.com/xml/ns/spi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.quest.com/xml/ns/spi ../../xml/ns/spi/BasePackage.xsd" contact="Foglight Core" version="1.0" displayName="Base Package" name="BasePkg" description="Instrumentation Base Package">
+    <plugins>
+        <plugin uses="JCollector" name="$agentName" loglevel="info" activate="true" plugin="com.quest.spi.support.collector.CollectorAgent" pluginName="$agentName">
+            <properties>
+                <property name="Home" description="Home directory">../../$agentName/$version</property>
+                <property name="XMLfileName" description="Package for definitions">config/${agentName}/${agentName}Manifest.xml</property>
+                <property name="enableDynamicData" description="Flag to generate dynamic table"></property>
+                <property name="frequencyProperty" description="Flag to calculate frequency setting from ASP">${agentName}/sample_freq?row=5</property>
+            </properties>
+        </plugin>
+    </plugins>
+</BasePackage:package>
+			"""
+			}
+			
+			
+			f = new File(properties.get("installerOutput")+"/${agentName}/${version}/config/${agentName}/${agentName}LogDefs.xml")
+			f.withWriter { wrt ->
+							wrt << """\
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns:Log="http://www.quest.com/xml/ns/spi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+				xsi:schemaLocation="http://www.quest.com/xml/ns/spi/Logs.xsd" contact="Foglight Group" 
+				version="1.0" displayName="Log4j definitions" name="LogDefs" description="Log4j definitions" 
+			fileName="${agentName}LogDefs.xml">
+    <properties>
+        <property name="appender.LogLevel" desc="appender log threshold">INFO</property>
+        <property name="appender.Name" desc="appender name"></property>
+        <property name="appender.Class" desc="appender class type">org.apache.log4j.DailyRollingFileAppender</property>
+        <property name="appender.File" desc="appender log file name">logs/#instance#.log</property>
+        <property name="appender.MaxFileSize" desc="appender file max. size(KB)">1000</property>
+        <property name="appender.MaxBackupIndex" desc="appender file max. count">7</property>
+        <property name="appender.FilePattern" desc="Daily rolling appender type">daily</property>
+        <property name="appender.ConversionPattern" desc="appender line pattern">%d{ABSOLUTE} %-5p [%t]: %m%n</property>
+    </properties>
+</package>"""}
+			
+			f = new File(properties.get("installerOutput")+"/${agentName}/${version}/config/${agentName}/${agentName}Manifest.xml")
+			f.withWriter { wrt ->
+							wrt << """\
+<?xml version="1.0" encoding="UTF-8"?>
+<Manifest:package xmlns:Manifest="http://www.quest.com/xml/ns/spi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+					xsi:schemaLocation="http://www.quest.com/xml/ns/spi/Manifest.xsd" 
+			contact="Foglight Group" version="1.0" displayName="Manifest" filename="${agentName}Manifest.xml" name="Manifest" description="Manifest">
+    <Properties/>
+    <connection connectionName="ConfigDefs">
+        <properties>
+            <property name="XMLfileName" description="Package for configuration definitions">ConfigDefs.xml</property>
+        </properties>
+    </connection>
+    <connection connectionName="ProcedureDefs">
+        <properties>
+            <property name="XMLfileName" description="Package for procedure definitions">${agentName}ProcedureDefs.xml</property>
+        </properties>
+    </connection>
+    <connection connectionName="LogDefs">
+        <properties>
+            <property name="XMLfileName" description="Package for Logging definitions">${agentName}LogDefs.xml</property>
+        </properties>
+    </connection>
+</Manifest:package>"""}
+			
+			f = new File(properties.get("installerOutput")+"/${agentName}/${version}/config/${agentName}/${agentName}ProcedureDefs.xml")
+			f.withWriter { wrt ->
+							wrt << """\
+			<?xml version="1.0" encoding="UTF-8"?>
+			<Procedure:package xmlns:Procedure="http://www.quest.com/xml/ns/spi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+					xsi:schemaLocation="http://www.quest.com/xml/ns/spi/Procedure.xsd" contact="Foglight Group" 
+					version="1.0" displayName="Procedure definitions" name="ProcedureDefs" 
+					description="Procedure definitions for the Type1_NT_Script package" 
+					fileName="${agentName}ProcedureDefs.xml"/>
+			"""}
+		]]>
+						</groovy>
+
+						<zip destfile="${basedir}/build/agents/installers/${agentname}_${packageName}_installer_${cartridge.version}.spar">
+							<fileset dir="${installerOutput}" includes="**/*" />
+						</zip>

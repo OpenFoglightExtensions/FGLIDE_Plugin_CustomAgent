@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<types xmlns="urn:quest-com:wcf-types-3-0">
+	<type name="ASPContainer" extends="wcf:WritableDataObject">
+		<property name="aspGroups" type="ASPGroup" is-many="true" />
+	</type>
+	<type name="ASPGroup" extends="ASPObject">
+		<property name="properties" type="ASPProperty" is-many="true" />
+	</type>
+	<type name="ASPObject" extends="wcf:WritableDataObject">
+		<property name="id" type="wcf:String">
+			<set annotation="identity" />
+		</property>
+		<property name="label" type="wcf:String" />
+		<property name="pos" type="wcf:Number" />
+		<property name="xml" type="wcf:String">
+			<set annotation="expressionType">script</set>
+			<set annotation="expression"><![CDATA[return '''
+<xml>
+<test name='blaber'/>
+</xml> ''']]></set>
+		</property>
+	</type>
+	<type name="ASPProperty" extends="ASPObject">
+		<property name="default" type="wcf:String" />
+	</type>
+	<type name="EnumValue" extends="ASPObject" />
+	<type name="PropBoolean" extends="SecondaryASPProperty" />
+	<type name="PropEnum" extends="SecondaryASPProperty">
+		<property name="enums" type="EnumValue" is-many="true" />
+	</type>
+	<type name="PropFloat" extends="PropNumeric">
+		<property name="default" type="wcf:Float" />
+		                <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+xml.float(
+	id:object.get("id",null),
+	label:object.get("label",null),
+ 	renderInline:object.get("renderInline",null),
+	canBeBlank:object.get("canBeBlank",null),
+	default:object.get("default",null),
+	encrypted:object.get("encrypted",null),
+	hidden:object.get("hidden",null),
+	// specific Props following
+	equalZero:object.get("equalZero",null),
+	gtEqualZero:object.get("gtEqualZero",null),
+	ltEqualZero:object.get("ltEqualZero",null),
+	notEqualZero:object.get("notEqualZero",null)
+)
+
+return writer.toString()]]></set>
+        </property>
+	</type>
+	<type name="PropInteger" extends="PropNumeric">
+		<property name="default" type="wcf:Integer" />
+		                <property name="xml" type="wcf:String">
+            <set annotation="expressionType">script</set>
+            <set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+xml.integer(
+	id:object.get("id",null),
+	label:object.get("label",null),
+ 	renderInline:object.get("renderInline",null),
+	canBeBlank:object.get("canBeBlank",null),
+	default:object.get("default",null),
+	encrypted:object.get("encrypted",null),
+	hidden:object.get("hidden",null),
+	// specific Props following
+	equalZero:object.get("equalZero",null),
+	gtEqualZero:object.get("gtEqualZero",null),
+	ltEqualZero:object.get("ltEqualZero",null),
+	notEqualZero:object.get("notEqualZero",null)
+)
+
+return writer.toString()]]></set>
+        </property>
+		
+	</type>
+	<type name="PropNumeric" extends="SecondaryASPProperty">
+		<property name="ltEqualZero" type="wcf:Boolean" />
+		<property name="equalZero" type="wcf:Boolean" />
+		<property name="gtEqualZero" type="wcf:Boolean" />
+		<property name="notEqualZero" type="wcf:Boolean" />
+	</type>
+
+</type>
+	<type name="PropSecondaryASP" extends="ASPProperty">
+		<property name="cols" type="SecondaryASPProperty" is-many="true" />
+	</type>
+	<type name="PropString" extends="SecondaryASPProperty">
+		<property name="size" type="wcf:Integer" />
+		<property name="xml" type="wcf:String">
+			<set annotation="expressionType">script</set>
+			<set annotation="expression"><![CDATA[import groovy.xml.MarkupBuilder
+
+def  writer = new StringWriter()
+def xml = new MarkupBuilder(writer)
+
+xml.string(
+	size:object.get("size",null),
+	id:object.get("id",null),
+	label:object.get("label",null),
+ 	renderInline:object.get("renderInline",null),
+	canBeBlank:object.get("canBeBlank",null),
+	default:object.get("default",null),
+	encrypted:object.get("encrypted",null),
+hidden:object.get("hidden",null)
+)
+
+return writer.toString()]]></set>
+		</property>
+	</type>
+	<type name="SecondaryASPProperty" extends="ASPProperty">
+		<property name="encrypted" type="wcf:Boolean" />
+		<property name="default" type="wcf:String" />
+		<property name="renderInline" type="wcf:Boolean" />
+		<property name="hidden" type="wcf:Boolean" />
+		<property name="canBeBlank" type="wcf:Boolean" />
+	</type>
+	<type name="TEST" extends="wcf:WritableDataObject">
+		<property name="name" type="wcf:Object" />
+	</type>
+</types>

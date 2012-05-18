@@ -1,0 +1,72 @@
+	<target name="_create_Agent_Installer_@@AGENT_NAME@@">
+		<property name="agentname" value="@@AGENT_NAME@@" />
+				
+		<mkdir dir="${basedir}/build/agents/${agentname}/xml" />
+		<mkdir dir="${basedir}/build/agents/installers/" />
+
+		<property name="aspfile" value="${basedir}/src/agents/${agentname}/xml/asp_definition.xml">
+		</property>
+		<property name="outputdir" value="${basedir}/build/agents/${agentname}/xml">
+		</property>
+		<property name="cmdline" value="@@CMD_LINE@@" />
+
+
+		<groovy>
+			<![CDATA[
+			println  "Building ASP Settings for Agent :"+properties.get("agentname")
+
+			import com.quest.glue.tools.compiler.*;
+			import com.quest.glue.tools.compiler.agentdef.schema.current.*;
+			import com.quest.glue.tools.compiler.property.fmsconfig.MonitoringPolicyWriter;
+			import com.quest.glue.tools.compiler.property.spiconfig.ConfigDefWriter;
+						
+			final File output = new File(properties.get("outputdir"));
+			agentName = properties["agentname"]
+
+			AgentDefinition mAgentDefinition = null;
+			mFactory = new AgentDefinitionFactory()
+
+			File aspSettings = new File(properties.get("aspfile"))
+
+			def asps = aspSettings.text
+			asps -= "</properties>"
+			asps += """			
+				<group id="base">
+				<string size="128" id="agentname" default="Collector" hidden="true"/>
+				<string size="128" id="cmdLine" default="${properties["cmdline"]}" hidden="true"/>
+				<integer id="purgeDays"  default="180" hidden="true"/>
+				<string size="256" id="purgeTime" hidden="true" default="Days"/>
+				<string size="256" id="Platforms_supported" default="WinNT4.0 Windows2000 Windows2003 WindowsXP Linux2.4 Linux2.6 AIX4.3 AIX5.1 AIX5.2 AIX5.3 SunOS5.8 SunOS5.9 SunOS5.10 HP-UXB.11"/>
+				<integer id="sample_freq" label="Collection Frequency (secs)" default="60"/>
+			</group>
+		</properties>"""
+		
+			def xml = """<?xml version="1.0" encoding="UTF-8"?>
+		<agent-definition xmlns="urn:X-quest.com:glue/agent/definition/1.5"	name="$agentName" ver="1.1.0">
+			<agent package="de.quest" name="$agentName">
+					$asps
+
+				</agent>
+		</agent-definition>
+			"""
+	
+			mAgentDefinition= mFactory.unmarshal(xml);
+			
+			
+		    final MonitoringPolicyWriter writer = new MonitoringPolicyWriter(new HashSet<Agent>(mAgentDefinition.getAgent()),
+					agentName	, "SPI");
+
+			writer.write(output);
+			
+			new ConfigDefWriter(output).visit(mAgentDefinition.getAgent().get(0));
+
+			println "Files Created"
+	]]>					
+</groovy>
+
+
+		<!-- for each ScriptPackage -->
+@@PACKAGES@@
+		<!-- END for all Packages -->
+					</target>
+

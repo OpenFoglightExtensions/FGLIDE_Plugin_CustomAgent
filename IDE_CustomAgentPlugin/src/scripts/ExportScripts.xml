@@ -1,0 +1,222 @@
+e<?xml version="1.0" encoding="UTF-8"?>
+<foglight-config exported-on="2010-06-13T20:05:26.58Z"
+	version="1.0.3.0">
+		<persistable-script name="FGLIDE_GetAntBuilder">
+		<signature>
+		</signature>
+		<documentation>
+			<description>doc</description>
+		</documentation>
+
+
+
+
+		<body><![CDATA[
+			return new AntBuilder()	
+		]]></body>
+	</persistable-script>
+
+		<persistable-script name="fglide_CA_exportASP">
+		<signature>
+		<!--  enter your Arguments in here -->
+		<arg name="dir" optional="false">
+      <description><![CDATA[The File Location to store the export]]></description>
+</arg>
+<arg name="xml" optional="false">
+      <description><![CDATA[The XML Data]]></description>
+</arg>
+<arg name="agentname" optional="false">
+      <description><![CDATA[The Agentname needed for the ASP Def Files]]></description>
+</arg>
+<arg name="cmdline" optional="false">
+      <description><![CDATA[The Agentname needed for the ASP Def Files]]></description>
+</arg>
+
+		</signature>
+		<documentation>
+			<description>Use this function to Create the xml settings and helper files</description>
+		</documentation>
+
+
+		<body><![CDATA[
+							import com.quest.glue.tools.compiler.*;
+			import com.quest.glue.tools.compiler.agentdef.schema.current.*;
+			import com.quest.glue.tools.compiler.property.fmsconfig.MonitoringPolicyWriter;
+			import com.quest.glue.tools.compiler.property.spiconfig.ConfigDefWriter;
+			
+		def xml = args[2]
+		def dir = new File(args[1])
+		def agentName = args[3]
+		def cmdline = args[4]
+		dir.mkdirs()
+		def output = new File(dir,"/build/agents/${agentName}/xml")
+		output.mkdirs()
+		
+			xml -= "</properties>"
+			xml += """			
+				<group id="base" label="Base">
+				<string size="128" id="agentname" default="Collector" hidden="true" />
+				<string size="128" id="cmdLine" default="$cmdline" hidden="true"/>
+				<integer id="purgeDays"  default="180" hidden="true"/>
+				<string size="256" id="purgeTime" hidden="true" default="Days"/>
+				<string size="256" id="Platforms_supported" hidden="true" default="WinNT4.0 Windows2000 Windows2003 WindowsXP Linux2.4 Linux2.6 AIX4.3 AIX5.1 AIX5.2 AIX5.3 SunOS5.8 SunOS5.9 SunOS5.10 HP-UXB.11"/>
+				<integer id="sample_freq" label="Collection Frequency (secs)" default="60"/>
+			</group>
+		</properties>"""
+		
+
+ 		def agent = new Agent();
+		
+		agent.setName(agentName);
+
+		AgentProperties props = new AgentProperties();
+
+List<Group> groups = props.getGroups();
+
+def propResolution = null
+propResolution ={ p->
+	def name = p.name()
+	def prop = null
+	switch (name) {
+		case "string" :
+			prop = new StringProperty()
+			prop.id = p.'@id'
+			if (p.'@label' != null && p.'@label'.text() != "") prop.label = p.'@label'
+			prop.hidden = returnBool (p.'@hidden') 
+			prop.canBeBlank =returnBool (p.'@canBeBlank' )
+			prop.default = p.'@default'
+			prop.renderInline = returnBool (p.'@renderInline' )
+			prop.encrypted = returnBool(p.'@encrypted') 
+		
+			prop.size = p.'@size'.text() as BigInteger
+		
+		
+			break
+		case "integer" :
+			prop = new IntegerProperty()
+			prop.id = p.'@id'
+			if (p.'@label' != null && p.'@label'.text() != "") prop.label = p.'@label'
+			prop.hidden = returnBool (p.'@hidden' )
+			prop.canBeBlank =returnBool (p.'@canBeBlank' )
+			prop.renderInline = returnBool (p.'@renderInline' )
+			prop.encrypted = returnBool (p.'@encrypted' ) 
+		// Default
+			prop.default = p.'@default'.text() as BigInteger
+		// specials
+			prop.gtEqualZero= returnBool (p.'@gtEqualZero' ) 
+			prop.equalZero= returnBool (p.'@equalZero' ) 
+			prop.notEqualZero= returnBool (p.'@notEqualZero' )
+			prop.ltEqualZero= returnBool (p.'@ltEqualZero' )
+		
+			break
+		case "float" :
+			prop = new FloatProperty()
+			prop.id = p.'@id'
+			if (p.'@label' != null && p.'@label'.text() != "") prop.label = p.'@label'
+			prop.hidden = returnBool (p.'@hidden' )
+			prop.canBeBlank =returnBool (p.'@canBeBlank' )
+			prop.renderInline = returnBool (p.'@renderInline' )
+			prop.encrypted = returnBool (p.'@encrypted' ) 
+		// Default
+			prop.default = p.'@default'.text() as Float
+		// specials
+			prop.gtEqualZero= returnBool (p.'@gtEqualZero' ) 
+			prop.equalZero= returnBool (p.'@equalZero' ) 
+			prop.notEqualZero= returnBool (p.'@notEqualZero' )
+			prop.ltEqualZero= returnBool (p.'@ltEqualZero' )
+		
+		
+			break
+		case "boolean" :
+			prop = new BooleanProperty()
+			prop.id = p.'@id'
+			if (p.'@label' != null && p.'@label'.text() != "") prop.label = p.'@label'
+			prop.hidden = returnBool (p.'@hidden' )
+			prop.canBeBlank =returnBool (p.'@canBeBlank' )
+			prop.renderInline = returnBool (p.'@renderInline' )
+		// Default
+			prop.default = returnBool(p.'@default')
+		
+		
+			break
+		case "secondary" :
+			prop = new SecondaryASP()
+			prop.id = p.'@id'
+			if (p.'@label' != null && p.'@label'.text() != "") prop.label = p.'@label'
+			prop.hidden = returnBool (p.'@hidden' )
+			prop.canBeBlank =returnBool (p.'@canBeBlank' )
+			prop.renderInline = returnBool (p.'@renderInline' )
+			prop.default = p.'@default'.text()
+			prop.size = p.'@size'.text() as BigInteger
+		
+			def cols = p.cols.children().collect (propResolution)
+	
+			def c = new Cols()
+			c.properties.addAll(cols)
+			prop.setCols (c)
+			break
+		case "enum" :
+			prop = new EnumProperty()
+			prop.id = p.'@id'
+			if (p.'@label' != null && p.'@label'.text() != "") prop.label = p.'@label'
+			prop.hidden = returnBool (p.'@hidden' )
+			prop.canBeBlank =returnBool (p.'@canBeBlank' )
+			prop.renderInline = returnBool (p.'@renderInline' )
+		// Default
+			prop.default = p.'@default'.text()
+			def enumConsts = p.children().collect{
+				def k = new Const()
+				k.id = it.'@id'.text()
+				k.label = it.'@label'.text()
+				return k	
+			}
+			prop.getConst().addAll (enumConsts);
+		
+			break
+	}
+	
+	return prop
+}
+
+boolean returnBool(def v) {
+	def vl = v.text().toLowerCase()
+	return vl == "true" || vl == "yes" || vl == "ja"?true:false
+}
+def asps = new XmlSlurper().parseText(xml)
+asps.group.each { g->
+	
+	Group group = new Group()
+	group.id = g.'@id'
+	group.label = g.'@label'
+	
+	def properties = g.children().collect (propResolution).findAll{ it != null}
+	
+	group.getProperties().addAll(properties)
+	
+	groups.add(group)
+}
+		
+	
+		agent.setProperties(props);
+
+		output.mkdirs();
+
+  
+		try {
+		def writer = new MonitoringPolicyWriter([agent] as Set,
+	            agentName, "SPI");
+			writer.write(output);
+			new ConfigDefWriter(output).visit(agent);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		println "Version 1"
+		
+		return "Files Created_1 in Dir :"+output
+	
+		]]></body>
+	</persistable-script>
+
+</foglight-config>

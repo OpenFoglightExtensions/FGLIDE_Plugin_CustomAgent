@@ -1,0 +1,91 @@
+<topologyExport version='1.0.0'>
+
+
+
+	<objectInstance type='IDE_CAR_ExportContainer' id='0'>
+		<stringProperty name='name'><![CDATA[CustomAgentPluginTest2]]></stringProperty>
+		<stringProperty name='description'><![CDATA[A Custom agent builder]]></stringProperty>
+		<objectProperty name='definitionGroups'>
+			<objectInstance type='IDE_Delegated_Group' id='1'>
+				<stringProperty name='name'><![CDATA[agents]]></stringProperty>
+				<objectProperty name='container'>
+					<objectReference refId='0' />
+				</objectProperty>
+				<objectProperty name='includes'>
+
+					<objectInstance type='IDE_CustomScriptagent' id='2'>
+						<stringProperty name='ci_id'><![CDATA[TestAgent2]]></stringProperty>
+						<stringProperty name='name'><![CDATA[TestAgent2]]></stringProperty>
+						<objectProperty name='parent'>
+							<objectReference refId='1' />
+						</objectProperty>
+
+						<stringProperty name='typeNameAgent'><![CDATA[TestAgent]]></stringProperty>
+						<stringProperty name='typeNameTable'><![CDATA[TestAgent_Table]]></stringProperty>
+						<stringProperty name='typeNameTableDataPrefix'><![CDATA[TestAgent_Data_]]></stringProperty>
+						<objectProperty name='agentPackages'>
+							<objectInstance type="IDE_CA_AgentFiles" id="3">
+								<stringProperty name='name'><![CDATA[default]]></stringProperty>
+								<objectProperty name="agentDefinition">
+									<objectReference refId="2"/>
+								</objectProperty>
+							</objectInstance>
+						</objectProperty>
+
+
+						<stringProperty name='aspDefinition'><![CDATA[
+			<properties>
+			<group id="BASE" label="s">
+
+				<string size="16" id="test" canBeBlank="false" default="Nope"
+					encrypted="false" hidden="false" label="T1" renderInline="false" />
+				<integer id="testi" label="Tester I" canBeBlank="false"
+					encrypted="false" default="10" equalZero="false" gtEqualZero="false"
+					hidden="false" ltEqualZero="false" notEqualZero="false"
+					renderInline="false" />
+				<float id="testf" label="TEster F" canBeBlank="false"
+					encrypted="false" default="10" equalZero="false" gtEqualZero="false"
+					hidden="false" ltEqualZero="false" notEqualZero="false"
+					renderInline="false" />
+				<boolean id="testB" label="TEST Boolean" canBeBlank="false"
+					default="true" hidden="false" renderInline="false" />
+				<secondary size="16" id="Tester" canBeBlank="false"
+					hidden="false" renderInline="false" encrypted="false" label="T1">
+					<cols>
+
+						<string size="16" id="test" canBeBlank="false" default="Nope"
+							encrypted="false" hidden="false" label="T1" renderInline="false" />
+						<integer id="testi" label="Tester I" canBeBlank="false"
+							encrypted="false" default="10" equalZero="false" gtEqualZero="false"
+							hidden="false" ltEqualZero="false" notEqualZero="false"
+							renderInline="false" />
+						<float id="testf" label="TEster F" canBeBlank="false"
+							encrypted="false" default="10" equalZero="false" gtEqualZero="false"
+							hidden="false" ltEqualZero="false" notEqualZero="false"
+							renderInline="false" />
+						<boolean id="testB" label="TEST Boolean" canBeBlank="false"
+							default="true" hidden="false" renderInline="false" />
+						<enum default="NO" id="ENUM">
+							<const id="NO" label="Nein" />
+							<const id="Yes" label="JA" />
+						</enum>
+					</cols>
+
+				</secondary>
+				<enum default="NO" id="ENUM" >
+					<const id="NO" label="Nein" />
+					<const id="Yes" label="JA" />
+				</enum>
+
+			</group>
+			</properties>
+		]]></stringProperty>
+
+					</objectInstance>
+				</objectProperty>
+			</objectInstance>
+		</objectProperty>
+
+		<stringProperty name='author'><![CDATA[stefan.marx@quest.com]]></stringProperty>
+	</objectInstance>
+</topologyExport>

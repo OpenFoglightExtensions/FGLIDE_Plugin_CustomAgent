@@ -1,0 +1,50 @@
+<topologyExport version='1.0.0'>
+  <objectInstance type='IDE_CAR_ExportContainer' id='0'>
+    <stringProperty name='name' xml:space='preserve'>CustomAgentPlugin</stringProperty>
+    <stringProperty name='description' xml:space='preserve'>Stefan Marx</stringProperty>
+    <objectProperty name='definitionGroups'>
+      <objectInstance type='IDE_ExpGroup_WCF' id='1'>
+        <stringProperty name='name' xml:space='preserve'>wcf</stringProperty>
+        <objectProperty name='container'>
+          <objectReference refId='0' />
+        </objectProperty>
+        <objectProperty name='includes'>
+          <objectInstance type='IDE_CI_WCFDefinition' id='2'>
+            <stringProperty name='ci_id' xml:space='preserve'>system:development_agents</stringProperty>
+            <objectProperty name='parent'>
+              <objectReference refId='1' />
+            </objectProperty>
+            <stringProperty name='name' xml:space='preserve'>system:development_agents</stringProperty>
+          </objectInstance>
+          <objectInstance type='IDE_CI_WCFDefinition' id='3'>
+            <stringProperty name='ci_id' xml:space='preserve'>system:development_agents_customscriptagent</stringProperty>
+            <objectProperty name='parent'>
+              <objectReference refId='1' />
+            </objectProperty>
+            <stringProperty name='name' xml:space='preserve'>system:development_agents_customscriptagent</stringProperty>
+          </objectInstance>
+        </objectProperty>
+      </objectInstance>
+    </objectProperty>
+    <objectProperty name='dependencies'>
+      <objectInstance type='IDE_CAR_Dependency' id='4'>
+        <stringProperty name='carName' xml:space='preserve'>fglIDE-export</stringProperty>
+        <objectProperty name='container'>
+          <objectReference refId='0' />
+        </objectProperty>
+        <stringProperty name='version' xml:space='preserve'>5.6.1</stringProperty>
+        <objectProperty name='type'>
+          <objectInstance type='IDE_CAR_DependencyType' id='5'>
+            <stringProperty name='value' xml:space='preserve'>0</stringProperty>
+          </objectInstance>
+        </objectProperty>
+        <objectProperty name='MatchType'>
+          <objectInstance type='IDE_CAR_DependencyMatchType' id='6'>
+            <stringProperty name='value' xml:space='preserve'>3</stringProperty>
+          </objectInstance>
+        </objectProperty>
+      </objectInstance>
+    </objectProperty>
+    <stringProperty name='author' xml:space='preserve'>Stefan Marx</stringProperty>
+  </objectInstance>
+</topologyExport>

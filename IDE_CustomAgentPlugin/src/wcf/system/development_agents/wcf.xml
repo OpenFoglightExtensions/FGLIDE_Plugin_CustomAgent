@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3-027" display-name="Agents" last-entity-id="1" parent="system:development_export">
+    <composite-view id="1" display-name="ASP_SecondaryASPEditor" ts="1286192397073" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>f6920c98-b3b6-49f7-a02d-85398c31847d</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="ASPEditorInner"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropSecondaryASP"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="500"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.21">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="2" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve"><![CDATA[size :]]></string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="right"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="4" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)Size" ts="1286188834763" public="false" component="wcf.bean-input.drop-down">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropSecondaryASP"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="items">
+                        <function-rv id="system:development_agents_customscriptagent.44"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve"><![CDATA[size]]></string>
+                    </property>
+                    <property name="sizing">
+                        <component-sizing>
+                            <width preferred="200"/>
+                            <height preferred="20"/>
+                        </component-sizing>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+</module>
+

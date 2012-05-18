@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+  Copyright 2009 Quest Software, Inc.
+  ALL RIGHTS RESERVED.
+  
+  This software is the confidential and proprietary information of
+  Quest Software Inc. ("Confidential Information").  You shall not
+  disclose such Confidential Information and shall use it only in
+  accordance with the terms of the license agreement you entered
+  into with Quest Software Inc.
+  
+  QUEST SOFTWARE INC. MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT
+  THE SUITABILITY OF THE SOFTWARE, EITHER EXPRESS OR IMPLIED,
+  INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF
+  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
+  NON-INFRINGEMENT. QUEST SOFTWARE SHALL NOT BE LIABLE FOR ANY
+  DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING
+  OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES.
+-->
+
+<!DOCTYPE topology-adapter SYSTEM "../../dtd/topology-adapter.dtd">
+
+<topology-adapter>
+	<transformation>
+		<node pattern="SPI">
+			<node>
+				<node_name var="$plugin_name"/>
+				
+				<obj type="F4Host" var="_host"/>
+				<attr target="{_host}" name="name" val="agentInfo{agent.host}"/>
+
+				<obj type="@@TYPE_AGENT@@" var="_agent"/>
+				<attr target="{_agent}" name="agentID" val="agentInfo{agentID}"/>
+				<attr target="{_agent}" name="pluginName" val="{$plugin_name}"/>
+				<attr target="{_agent}" name="name" val="{$plugin_name}"/>
+				<attr target="{_agent}" name="type" val="{$plugin_name}"/>
+				<attr target="{_agent}" name="agentName" val="agentInfo{agent.name}"/>
+				<attr target="{_agent}" name="agentInstance" val="agentInfo{agent.instance}"/>
+				<attr target="{_agent}" name="hostName" val="agentInfo{agent.host}"/>
+				
+				<attr target="{_agent}" name="host" val="{_host}"/>
+				<attr target="{_host}" name="agents" val="{_agent}"/>
+				
+        		<obj type="Foglight4Model" var="_model"/>
+        		<attr target="{_model}" name="name" val="Foglight4Model"/>
+        		<attr target="{_model}" name="IPMap" val="{_host}"/>
+
+				<node>
+					<node_name var="$ipoint_name"/>
+					
+    				<format var="$tableType" pattern="@@TYPE_TABLE_PREFIX@@{1}">
+    					<param val="{$plugin_name}"/>
+    					<param val="{$ipoint_name}"/>
+    				</format>
+
+					<node pattern="row">
+					
+    					<obj type="{$tableType}" var="_table" super-type="@@TYPE_TABLE@@"/>
+    					<attr target="{_table}" name="name" val="{$ipoint_name}"/>
+    					<attr target="{_table}" name="agent" val="{_agent}"/>
+    					<attr target="{_agent}" name="tables" val="{_table}"/>
+    
+    					<metrics_group object="{_table}"/>
+    					
+                    	<node pattern="Time">
+                      		<value>
+                        		<discard_value validate="false"/>
+                      		</value>
+                		</node>
+						<node>
+							<!-- The column name is in the following format:
+								 name[.<type>[.<id|obs>]][:<unit>]
+							 -->
+							<node_name var="colInfo[]" separator=":"/>
+							<set var="columnName[]" value="{colInfo[]}[0]" separator="\."/>
+							
+							<!-- Set the unit name, defaulting to "count" -->
+							<set var="$unitName" value="count"/>
+							<if val1="{colInfo[]}[1]" comparator="is_defined">
+								<set var="$unitName" value="{colInfo[]}[1]"/>
+							</if>
+							
+							<!-- Set the defaults for the other fields -->
+							<set var="$columnType" value="Metric"/>
+							<set var="$isIdentity" value="false"/>
+							<set var="$isObservation" value="true"/>
+							
+							<!-- Check whether a type is specified for the column -->
+							<if val1="{columnName[]}[1]" comparator="is_defined">
+								<set var="$columnType" value="{columnName[]}[1]"/>
+								<set var="$isObservation" value="false"/>
+
+    							<if val1="{columnName[]}[2]" comparator="is_defined">
+    							
+									<!-- Check whether this type is marked as being an identity column -->
+        							<if val1="{columnName[]}[2]" comparator="equals" val2="id">
+										<set var="$isIdentity" value="true"/>
+        							</if>
+        							
+									<!-- Check whether this type is marked as being an observation -->
+        							<if val1="{columnName[]}[2]" comparator="equals" val2="obs">
+										<set var="$isObservation" value="true"/>
+        							</if>
+    							</if>
+							</if>
+							
+							<value var="$value" >
+							
+								<!-- Set an observation value -->
+    							<if val1="{$isObservation}" comparator="equals" val2="true">
+    								<if val1="{$columnType}" comparator="equals" val2="Metric">
+    									<metric type="{columnName[]}[0]" unit-name="{$unitName}"/>
+    								</if>
+    								<if val1="{$columnType}" comparator="equals" val2="Metric" negate="true">
+    									<observation name="{columnName[]}[0]" type="{$columnType}" value="{$value}"/>
+    								</if>
+    							</if>
+    							
+								<!-- Set a property value -->
+    							<if val1="{$isObservation}" comparator="equals" val2="false">
+									<attr target="{_table}" name="{columnName[]}[0]" type="{$columnType}"
+											is-identity="{$isIdentity}" val="{$value}"/>
+    							</if>
+    							
+							</value>
+						</node>
+					</node>
+				</node> <!-- Instrumentation Point -->
+			</node>
+		</node>
+	</transformation>
+</topology-adapter>

@@ -1,0 +1,3748 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="3-027" display-name="CustomScriptAgent" last-entity-id="58" parent="system:development_agents">
+    <view id="1" display-name="AgentFileExplorer" ts="1278434274729" component="wcf.table.row-table">
+        <uuid>fd63b321-c145-4c13-8f25-eea235a696b8</uuid>
+        <purpose name="pagelet"/>
+        <inputs>
+            <entry key="agentFiles" data-type="foglight-5:IDE_CA_AgentFiles"/>
+            <entry key="selRows" data-type="foglight-5:IDE_File" list="true" usage="internal" implicit="true"/>
+        </inputs>
+        <flow>
+            <on action="cellSelection">
+                <generated-context output-key="selectedRow" custom-key="selRow"/>
+                <generated-context output-key="selectedColumnId" custom-key="selCol"/>
+                <choose-value key="selCol">
+                    <case value="download">
+                        <invoke-task id="system:development_export.63">
+                            <context>
+                                <entry key="path">
+                                    <context-rv input-key="selRow" path="fullPath"/>
+                                </entry>
+                            </context>
+                        </invoke-task>
+                    </case>
+                    <default>
+                        <update/>
+                    </default>
+                </choose-value>
+            </on>
+            <on action="rowsSelection">
+                <generated-context output-key="selectedRows" custom-key="selRows"/>
+                <update/>
+            </on>
+        </flow>
+        <config>
+            <property name="rows">
+                <context-rv input-key="agentFiles" path="files"/>
+            </property>
+            <property name="columns">
+                <list-value>
+                    <object>
+                        <property name="value">
+                            <context-rv input-key="currentRow" path="date"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">c_1</string>
+                        </property>
+                        <property name="cellAlignment">
+                            <object>
+                                <property name="horizontal">
+                                    <enum value="left"/>
+                                </property>
+                            </object>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <context-rv input-key="currentRow" path="size"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">c_2_2</string>
+                        </property>
+                        <property name="cellAlignment">
+                            <object>
+                                <property name="horizontal">
+                                    <enum value="right"/>
+                                </property>
+                            </object>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <context-rv input-key="currentRow" path="filename" renderer-id="system:wcf_common_ui_table.2"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">c_2</string>
+                        </property>
+                        <property name="cellAlignment">
+                            <object>
+                                <property name="horizontal">
+                                    <enum value="left"/>
+                                </property>
+                            </object>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <icon-rv id="system:utiliconset.37"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">download</string>
+                        </property>
+                        <property name="header">
+                            <string-rv>
+                                <value xml:space="preserve"> </value>
+                            </string-rv>
+                        </property>
+                        <property name="width">
+                            <object>
+                                <property name="sizing">
+                                    <enum value="specified"/>
+                                </property>
+                                <property name="value">
+                                    <integer value="20"/>
+                                </property>
+                            </object>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="multipleSelection">
+                <object>
+                    <property name="showCheckboxes">
+                        <boolean value="false"/>
+                    </property>
+                </object>
+            </property>
+            <property name="selectionConfiguration">
+                <object>
+                    <property name="autoSelectPolicy">
+                        <enum value="none"/>
+                    </property>
+                </object>
+            </property>
+            <property name="initialSortColumnId">
+                <string xml:space="preserve">c_1</string>
+            </property>
+            <property name="actionGroups">
+                <list-value>
+                    <object>
+                        <property name="actions">
+                            <list-value>
+                                <object>
+                                    <property name="icon">
+                                        <icon-ref value="system:utiliconset.4"/>
+                                    </property>
+                                    <property name="label">
+                                        <string xml:space="preserve">upload File</string>
+                                    </property>
+                                    <property name="reaction">
+                                        <popup id="system:development_agents_customscriptagent.uploadDlg" type="modal"/>
+                                    </property>
+                                </object>
+                            </list-value>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="selectionActions">
+                <list-value>
+                    <object>
+                        <property name="icon">
+                            <icon-ref value="system:administration.129"/>
+                        </property>
+                        <property name="label">
+                            <string xml:space="preserve">delete</string>
+                        </property>
+                        <property name="reaction">
+                            <popup id="system:development_export.deleteConfirmDlg" type="modal">
+                                <context>
+                                    <entry key="files">
+                                        <context-rv input-key="selRows" path="fullPath"/>
+                                    </entry>
+                                </context>
+                            </popup>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="icon">
+                            <icon-ref value="system:utiliconset.50"/>
+                        </property>
+                        <property name="label">
+                            <string xml:space="preserve">change main Command</string>
+                        </property>
+                        <property name="reaction">
+                            <update>
+                                <context>
+                                    <entry key="result">
+                                        <function-rv id="system:development_agents_customscriptagent.10">
+                                            <context-rv input-key="agentFiles" path="agentDefinition"/>
+                                            <context-rv input-key="selRows" path="filename" results-index="0"/>
+                                        </function-rv>
+                                    </entry>
+                                </context>
+                            </update>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <composite-view id="uploadDlg" display-name="FileUploadDlg" ts="1278424662418" public="false" component="wcf.grid2">
+        <uuid>0ac5219a-65a8-44f6-8320-d759add8095d</uuid>
+        <purpose name="dialog"/>
+        <inputs>
+            <entry key="agentFiles" data-type="foglight-5:IDE_CA_AgentFiles"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="nested">
+            <size height="100"/>
+            <config>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="bottom"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+                <property name="vweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="label" ts="1278425016959" public="false" component="wcf.label">
+                <inputs>
+                    <entry key="agentFiles" data-type="foglight-5:IDE_CA_AgentFiles"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="label">
+                        <rich-text-rv>
+                            <value xml:space="preserve">The files will be uploaded to the local FMS Directory. You may also manipulate and change them directly in {0}</value>
+                            <context-rv input-key="agentFiles" path="localPath"/>
+                        </rich-text-rv>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="1" view="nested">
+            <size/>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="(Nested View 2)" ts="1278425481521" public="false" component="wcf.input.file">
+                <inputs>
+                    <entry key="agentFiles" data-type="foglight-5:IDE_CA_AgentFiles"/>
+                    <entry key="File" data-type="wcf:Object" usage="optional" implicit="true"/>
+                </inputs>
+                <generated-context output-key="value" custom-key="File"/>
+                <flow>
+                    <on action="update">
+                        <previous update="context">
+                            <context>
+                                <entry key="_dump">
+                                    <function-rv id="system:development_agents_customscriptagent.2">
+                                        <context-rv input-key="File"/>
+                                        <context-rv input-key="agentFiles" path="localPath"/>
+                                    </function-rv>
+                                </entry>
+                            </context>
+                        </previous>
+                    </on>
+                </flow>
+                <config>
+                    <property name="label">
+                        <string xml:space="preserve">Upload Files :</string>
+                    </property>
+                    <property name="required">
+                        <boolean value="true"/>
+                    </property>
+                    <property name="applyButton">
+                        <string xml:space="preserve">Upload</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <composite-view id="5" display-name="ScriptAgentEditor" ts="1286188154221" component="wcf.grid2">
+        <uuid>3c726b0f-b7ba-4ce8-a443-68b735492a55</uuid>
+        <purpose name="page"/>
+        <inputs>
+            <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="pageOptions">
+                <object>
+                    <property name="pageStyleOptions">
+                        <object>
+                            <property name="style">
+                                <enum value="descriptive"/>
+                            </property>
+                            <property name="pageTitle">
+                                <string-rv>
+                                    <value xml:space="preserve">{0} Script Agent Editor
+</value>
+                                    <icon-rv id="system:utiliconset.11"/>
+                                </string-rv>
+                            </property>
+                            <property name="description">
+                                <rich-text-rv>
+                                    <value xml:space="preserve">This Editor allows to modify the following Script agent: {0}</value>
+                                    <context-rv input-key="agent" path="name"/>
+                                </rich-text-rv>
+                            </property>
+                        </object>
+                    </property>
+                </object>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="nested">
+            <size height="150"/>
+            <config>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+                <property name="minHeight">
+                    <integer value="50"/>
+                </property>
+                <property name="showTitle">
+                    <boolean value="true"/>
+                </property>
+                <property name="showBorder">
+                    <boolean value="true"/>
+                </property>
+            </config>
+            <composite-view id="nested" display-name="nv)Details" ts="1278429728088" public="false" component="wcf.grid2">
+                <inputs>
+                    <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="title">
+                        <string xml:space="preserve">Agent Settings</string>
+                    </property>
+                    <property name="sizing">
+                        <component-sizing>
+                            <width preferred="0"/>
+                            <height preferred="0"/>
+                        </component-sizing>
+                    </property>
+                </config>
+                <window id="2" view="nested">
+                    <size/>
+                    <config>
+                        <property name="align">
+                            <enum value="stretch"/>
+                        </property>
+                    </config>
+                    <view id="nested" display-name="btnChangeName" ts="1278432656079" public="false" component="wcf.input.button">
+                        <inputs>
+                            <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+                        </inputs>
+                        <flow>
+                            <on action="selection">
+                                <popup id="system:development_agents_customscriptagent.8" type="modal"/>
+                            </on>
+                        </flow>
+                        <config>
+                            <property name="label">
+                                <string xml:space="preserve">rename</string>
+                            </property>
+                            <property name="disabled">
+                                <boolean value="false"/>
+                            </property>
+                        </config>
+                    </view>
+                </window>
+                <window id="0" view="nested">
+                    <size/>
+                    <config>
+                        <property name="rowspan">
+                            <integer value="2"/>
+                        </property>
+                        <property name="column">
+                            <integer value="1"/>
+                        </property>
+                        <property name="align">
+                            <enum value="stretch"/>
+                        </property>
+                        <property name="valign">
+                            <enum value="stretch"/>
+                        </property>
+                        <property name="hweight">
+                            <integer value="1"/>
+                        </property>
+                    </config>
+                    <view id="nested" display-name="msg)" ts="1286188154189" public="false" component="wcf.label">
+                        <inputs>
+                            <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+                        </inputs>
+                        <flow/>
+                        <config>
+                            <property name="label">
+                                <rich-text-rv>
+                                    <value xml:space="preserve">The Agent Name is &lt;b>{0}&lt;/b> and the Data Configuration is 
+&lt;ul>
+&lt;li>Agent Typename : &lt;b> {1}&lt;/b>&lt;/li>
+&lt;li>Data Base Typename : &lt;b>{2}&lt;/b>&lt;/li>
+&lt;li>Data Type Prefix for dynamic typed Data : &lt;b>{3}&lt;/b>&lt;/li>
+&lt;/ul>
+&lt;br/>
+&lt;br/>
+The Agent will execute the Scrip &lt;b>{4}&lt;/b></value>
+                                    <context-rv input-key="agent" path="name"/>
+                                    <context-rv input-key="agent" path="typeNameAgent"/>
+                                    <context-rv input-key="agent" path="typeNameTable"/>
+                                    <context-rv input-key="agent" path="typeNameTableDataPrefix"/>
+                                    <context-rv input-key="agent" path="command">
+                                        <on-null>
+                                            <string-rv renderer-id="system:core_commons.12">
+                                                <value xml:space="preserve">&lt;Not yet defined, please upload a Script and select the main CMD></value>
+                                            </string-rv>
+                                        </on-null>
+                                    </context-rv>
+                                </rich-text-rv>
+                            </property>
+                        </config>
+                    </view>
+                </window>
+                <window id="1" view="nested">
+                    <size width="120"/>
+                    <config>
+                        <property name="row">
+                            <integer value="1"/>
+                        </property>
+                        <property name="valign">
+                            <enum value="stretch"/>
+                        </property>
+                        <property name="vweight">
+                            <integer value="1"/>
+                        </property>
+                    </config>
+                    <view id="nested" display-name="(Nested View 2)" ts="1278429437040" public="false" component="wcf.label">
+                        <flow/>
+                        <config>
+                            <property name="label">
+                                <string-rv>
+                                    <value xml:space="preserve"> </value>
+                                </string-rv>
+                            </property>
+                        </config>
+                    </view>
+                </window>
+            </composite-view>
+        </window>
+        <window id="1" view="nested">
+            <size/>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="stretch"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+                <property name="vweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <composite-view id="nested" display-name="nv)DetailedGroups" ts="1285666674230" public="false" component="wcf.tab-container">
+                <inputs>
+                    <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+                </inputs>
+                <config>
+                    <property name="displayStyle">
+                        <enum value="standard"/>
+                    </property>
+                </config>
+                <window id="0" view="system:development_agents_customscriptagent.1">
+                    <size/>
+                    <context>
+                        <entry key="agentFiles">
+                            <context-rv input-key="agent" path="agentPackages" results-index="0"/>
+                        </entry>
+                    </context>
+                    <config/>
+                </window>
+                <window id="1" view="system:development_agents_customscriptagent.12">
+                    <size/>
+                    <config/>
+                </window>
+            </composite-view>
+        </window>
+    </composite-view>
+    <view id="7" display-name="ChangeAgentName_inner" ts="1278429769068" public="false" component="wcf.input.text">
+        <uuid>01fe793a-1029-432d-8633-1872d72f3116</uuid>
+        <purpose name="pagelet"/>
+        <inputs>
+            <entry key="name" data-type="wcf:String" usage="optional" implicit="true"/>
+        </inputs>
+        <generated-context output-key="value" custom-key="name"/>
+        <flow>
+            <on action="update">
+                <update/>
+            </on>
+        </flow>
+        <config>
+            <property name="label">
+                <string xml:space="preserve">Please enter new Name :</string>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <view id="8" display-name="ChangeAgentName_DLG" ts="1278432756855" public="false" component="wcf.form">
+        <uuid>96215188-731c-47e1-85b2-42cd523aacd7</uuid>
+        <purpose name="dialog"/>
+        <inputs>
+            <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+            <entry key="name" data-type="wcf:String" usage="internal">
+                <context-rv input-key="agent" path="name"/>
+            </entry>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="view">
+                <view-ref value="system:development_agents_customscriptagent.7"/>
+            </property>
+            <property name="scrollbars">
+                <enum value="hidden"/>
+            </property>
+            <property name="actions">
+                <list-value>
+                    <object>
+                        <property name="text">
+                            <string xml:space="preserve">rename</string>
+                        </property>
+                        <property name="reaction">
+                            <previous update="context">
+                                <context>
+                                    <entry key="result">
+                                        <function-rv id="system:development_agents_customscriptagent.9">
+                                            <context-rv input-key="agent"/>
+                                            <context-rv input-key="name"/>
+                                        </function-rv>
+                                    </entry>
+                                </context>
+                            </previous>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <composite-view id="12" display-name="ASPEditor" ts="1326293106159" public="false" component="wcf.grid2">
+        <uuid>93a7662f-7495-4c2e-95a2-1ee596bfa2e7</uuid>
+        <purpose name="dialog"/>
+        <purpose name="page"/>
+        <purpose name="pagelet"/>
+        <inputs>
+            <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="4" view="nested">
+            <size height="30"/>
+            <config>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="nv)Toolbar" ts="1326293106130" public="false" component="wcf.toolbar">
+                <inputs>
+                    <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+                </inputs>
+                <flow>
+                    <on action="selection">
+                        <generated-context output-key="selectedActionId" custom-key="action"/>
+                        <choose-value key="action">
+                            <case value="edit">
+                                <popup id="system:development_agents_customscriptagent.57"/>
+                            </case>
+                            <default>
+                                <nop/>
+                            </default>
+                        </choose-value>
+                    </on>
+                </flow>
+                <config>
+                    <property name="groups">
+                        <list-value>
+                            <object>
+                                <property name="actions">
+                                    <list-value>
+                                        <object>
+                                            <property name="id">
+                                                <string xml:space="preserve">edit</string>
+                                            </property>
+                                            <property name="icon">
+                                                <icon-ref value="system:system.103"/>
+                                            </property>
+                                            <property name="label">
+                                                <string xml:space="preserve">edit</string>
+                                            </property>
+                                        </object>
+                                    </list-value>
+                                </property>
+                            </object>
+                        </list-value>
+                    </property>
+                    <property name="showText">
+                        <boolean value="true"/>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="3" view="system:development_agents_customscriptagent.58">
+            <size/>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="stretch"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+                <property name="vweight">
+                    <integer value="1"/>
+                </property>
+                <property name="showTitle">
+                    <boolean value="true"/>
+                </property>
+                <property name="showBorder">
+                    <boolean value="true"/>
+                </property>
+            </config>
+        </window>
+    </composite-view>
+    <composite-view id="15" display-name="NewGroup_Inner" ts="1278540976048" public="false" component="wcf.grid2">
+        <uuid>7558a22a-ff1d-4c32-8431-7ff1d5d8e124</uuid>
+        <purpose name="pagelet"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="group" data-type="development_agents_customscriptagent:ASPGroup"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="1" view="nested">
+            <size/>
+            <config>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="minWidth">
+                    <integer value="80"/>
+                </property>
+            </config>
+            <view id="nested" display-name="l)id" ts="1278540555630" public="false" component="wcf.label">
+                <flow/>
+                <config>
+                    <property name="label">
+                        <string xml:space="preserve">Group ID:</string>
+                    </property>
+                    <property name="align">
+                        <enum value="right"/>
+                    </property>
+                    <property name="sizing">
+                        <component-sizing>
+                            <width preferred="80"/>
+                            <height preferred="20"/>
+                        </component-sizing>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="0" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="nvID" ts="1278539991680" public="false" component="wcf.bean-input.text">
+                <inputs>
+                    <entry key="group" data-type="development_agents_customscriptagent:ASPGroup"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">id</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="2" view="nested">
+            <size/>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+            </config>
+            <view id="nested" display-name="l)label" ts="1278540528272" public="false" component="wcf.label">
+                <flow/>
+                <config>
+                    <property name="label">
+                        <string xml:space="preserve">Label :</string>
+                    </property>
+                    <property name="align">
+                        <enum value="right"/>
+                    </property>
+                    <property name="sizing">
+                        <component-sizing>
+                            <width preferred="100"/>
+                            <height preferred="20"/>
+                        </component-sizing>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="3" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="label" ts="1278540973726" public="false" component="wcf.bean-input.text">
+                <inputs>
+                    <entry key="group" data-type="development_agents_customscriptagent:ASPGroup"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="fieldWidth">
+                        <integer value="60"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">label</string>
+                    </property>
+                    <property name="sizing">
+                        <component-sizing>
+                            <width preferred="120"/>
+                            <height preferred="20"/>
+                        </component-sizing>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <view id="16" display-name="NewGroup" ts="1285754859868" public="false" component="wcf.form">
+        <uuid>9eeacf10-da64-4b16-8c4b-b570e44681ed</uuid>
+        <purpose name="dialog"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="group" data-type="development_agents_customscriptagent:ASPGroup" usage="optional">
+                <create-data-object-rv>
+                    <create-data-object type="development_agents_customscriptagent:ASPGroup" storage="none"/>
+                </create-data-object-rv>
+            </entry>
+            <entry key="container" data-type="development_agents_customscriptagent:ASPContainer"/>
+        </inputs>
+        <context>
+            <entry key="asp">
+                <context-rv input-key="group"/>
+            </entry>
+        </context>
+        <flow/>
+        <config>
+            <property name="view">
+                <view-ref value="system:development_agents_customscriptagent.17"/>
+            </property>
+            <property name="scrollbars">
+                <enum value="hidden"/>
+            </property>
+            <property name="actions">
+                <list-value>
+                    <object>
+                        <property name="text">
+                            <string xml:space="preserve">add</string>
+                        </property>
+                        <property name="reaction">
+                            <previous update="context">
+                                <context>
+                                    <entry key="erg">
+                                        <function-rv id="system:development_agents_customscriptagent.13">
+                                            <context-rv input-key="container"/>
+                                            <context-rv input-key="group"/>
+                                        </function-rv>
+                                    </entry>
+                                </context>
+                            </previous>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <composite-view id="17" display-name="ASP_GroupEditor" ts="1285755191155" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>ad2129bb-5528-44f3-8034-ba405d10922b</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="ASPEditorInner"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:ASPGroup"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="400"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="nested">
+            <size width="120"/>
+            <config>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="nvIDLabel" ts="1278673140117" public="false" component="wcf.label">
+                <flow/>
+                <config>
+                    <property name="label">
+                        <string xml:space="preserve">Group ID:</string>
+                    </property>
+                    <property name="align">
+                        <enum value="right"/>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="2" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="edit)ID" ts="1285755147797" public="false" component="wcf.bean-input.text">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:ASPGroup"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">id</string>
+                    </property>
+                    <property name="validate">
+                        <function-rv id="system:development_agents_customscriptagent.47">
+                            <context-rv input-key="inputValue"/>
+                            <context-rv input-key="pathToValue"/>
+                        </function-rv>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="1" view="nested">
+            <size width="120"/>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="nv)labLabel" ts="1278583352469" public="false" component="wcf.label">
+                <flow/>
+                <config>
+                    <property name="label">
+                        <string xml:space="preserve">Group Label :</string>
+                    </property>
+                    <property name="align">
+                        <enum value="right"/>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="3" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="edit)label" ts="1285755189542" public="false" component="wcf.bean-input.text">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:ASPGroup"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="fieldWidth">
+                        <integer value="60"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">label</string>
+                    </property>
+                    <property name="validate">
+                        <function-rv id="system:development_agents_customscriptagent.46">
+                            <context-rv input-key="inputValue"/>
+                            <context-rv input-key="pathToValue"/>
+                        </function-rv>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <view id="18" display-name="ASPEditor Frame Inner" ts="1279158026049" public="false" component="wcf.type">
+        <uuid>1c390d82-efe7-4235-ac41-b56d56f86abe</uuid>
+        <purpose name="pagelet"/>
+        <inputs>
+            <entry key="selectedASP" data-type="development_agents_customscriptagent:ASPObject"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="input">
+                <context-rv input-key="selectedASP"/>
+            </property>
+            <property name="selectorMode">
+                <enum value="none"/>
+            </property>
+            <property name="viewsFilter">
+                <object>
+                    <property name="showAllViews">
+                        <boolean value="false"/>
+                    </property>
+                    <property name="showPageViews">
+                        <boolean value="false"/>
+                    </property>
+                    <property name="showDialogViews">
+                        <boolean value="false"/>
+                    </property>
+                    <property name="showMenuViews">
+                        <boolean value="false"/>
+                    </property>
+                    <property name="showSummaryViews">
+                        <boolean value="false"/>
+                    </property>
+                    <property name="showCustomViews">
+                        <string xml:space="preserve">ASPEditorInner</string>
+                    </property>
+                </object>
+            </property>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <view id="19" display-name="ASPEditor_Dialog" ts="1278675165504" public="false" component="wcf.form">
+        <uuid>010226b1-33d6-4b3d-b746-9eac2c22479d</uuid>
+        <purpose name="pagelet"/>
+        <inputs>
+            <entry key="selectedASP" data-type="development_agents_customscriptagent:ASPObject"/>
+            <entry key="aspContainer" data-type="development_agents_customscriptagent:ASPContainer"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="view">
+                <view-ref value="system:development_agents_customscriptagent.18"/>
+            </property>
+            <property name="scrollbars">
+                <enum value="hidden"/>
+            </property>
+            <property name="actions">
+                <list-value>
+                    <object>
+                        <property name="text">
+                            <string xml:space="preserve">update ASP</string>
+                        </property>
+                        <property name="reaction">
+                            <update/>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <composite-view id="20" display-name="ASP_StringEditor" ts="1280320840067" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>696182a2-b9ca-4cdd-a03f-e1f3659dc199</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="ASPEditorInner"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropString"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="500"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.21">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="2" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">default :</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="right"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="3" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)Default" ts="1278680154511" public="false" component="wcf.bean-input.text">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropString"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="fieldWidth">
+                        <integer value="60"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">default</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="4" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="2"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)Size" ts="1280320837322" public="false" component="wcf.bean-input.drop-down">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropString"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="items">
+                        <function-rv id="system:development_agents_customscriptagent.44"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">size</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <composite-view id="21" display-name="ASP_Basics_Editor" ts="1285755239558" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>6443383c-175f-4549-8f7b-cae3299c9eac</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:ASPProperty"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">ID :</string>
+                </entry>
+            </context>
+            <config>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="2" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="edit)ID" ts="1285755223727" public="false" component="wcf.bean-input.text">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:ASPProperty"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">id</string>
+                    </property>
+                    <property name="validate">
+                        <function-rv id="system:development_agents_customscriptagent.47">
+                            <context-rv input-key="inputValue"/>
+                            <string xml:space="preserve">ID</string>
+                        </function-rv>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="4" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">label :</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="3" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="edit)label" ts="1285755238100" public="false" component="wcf.bean-input.text">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:ASPProperty"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="fieldWidth">
+                        <integer value="60"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">label</string>
+                    </property>
+                    <property name="validate">
+                        <function-rv id="system:development_agents_customscriptagent.46">
+                            <context-rv input-key="inputValue"/>
+                            <string xml:space="preserve">label</string>
+                        </function-rv>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="5" view="system:development_agents_customscriptagent.33">
+            <size/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">hidden ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+            </config>
+        </window>
+    </composite-view>
+    <view id="22" display-name="SubmitButton" ts="1278585491036" public="false" component="wcf.input.button">
+        <uuid>ec8a7247-c92b-4b20-9c1d-3a5c57d70bae</uuid>
+        <flow/>
+        <config>
+            <property name="label">
+                <string xml:space="preserve">submit changes</string>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <view id="23" display-name="EditLabel" ts="1278679361027" public="false" component="wcf.label">
+        <uuid>87a6edad-7eac-4246-ba1f-99d8108c2d41</uuid>
+        <inputs>
+            <entry key="lbl" data-type="wcf:String"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="label">
+                <context-rv input-key="lbl"/>
+            </property>
+            <property name="align">
+                <enum value="right"/>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <composite-view id="24" display-name="ASP_Numeric_Editor" ts="1278680202256" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>3c1ee9fc-b1de-4241-8e9b-b7010ea86a12</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Constraint Value &lt;= 0 ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="11" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)&lt;=0" ts="1278680343680" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">ltEqualZero</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="4" view="system:development_agents_customscriptagent.23">
+            <size/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Constraint Value = 0 ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="12" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i==0" ts="1278680362099" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">equalZero</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="5" view="system:development_agents_customscriptagent.23">
+            <size/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Constraint Value >= 0 ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="9" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="2"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)>=0" ts="1278680382469" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">gtEqualZero</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="6" view="system:development_agents_customscriptagent.23">
+            <size/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Constraint Value &lt;> 0 ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="3"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="10" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="3"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i) &lt;>0" ts="1278680405085" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">notEqualZero</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <composite-view id="25" display-name="ASP_IntegerEditor" ts="1308364943688" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>c692dbe6-342e-4166-b1a2-1380ea9c7ea7</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="ASPEditorInner"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropInteger"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="500"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.21">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="3" view="system:development_agents_customscriptagent.34">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="stretch"/>
+                </property>
+                <property name="vweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+        </window>
+        <window id="2" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">default :</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="2"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="4" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="2"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)Default" ts="1308364941732" public="false" component="wcf.bean-input.number">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropInteger"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="precision">
+                        <integer value="0"/>
+                    </property>
+                    <property name="fieldWidth">
+                        <integer value="20"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">default</string>
+                    </property>
+                    <property name="validate">
+                        <function-rv id="system:development_agents_customscriptagent.53">
+                            <string xml:space="preserve">Default Value</string>
+                            <context-rv input-key="inputValue"/>
+                        </function-rv>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <composite-view id="26" display-name="ASP_FloatEditor" ts="1308364867713" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>0adf9e7b-6077-490d-b031-207b1a95e3ed</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="ASPEditorInner"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropFloat"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="500"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.21">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="3" view="system:development_agents_customscriptagent.34">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="stretch"/>
+                </property>
+                <property name="vweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+        </window>
+        <window id="2" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">default :</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="2"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="4" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="2"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)Default" ts="1308364865633" public="false" component="wcf.bean-input.number">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropFloat"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="fieldWidth">
+                        <integer value="20"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">default</string>
+                    </property>
+                    <property name="validate">
+                        <function-rv id="system:development_agents_customscriptagent.54">
+                            <string xml:space="preserve">Default Value</string>
+                            <context-rv input-key="inputValue"/>
+                        </function-rv>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <composite-view id="27" display-name="ASP_BooleanEditor" ts="1278682298912" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>7b1f48e6-96f7-4e4b-b99f-cfd0b5faafca</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="ASPEditorInner"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropBoolean"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="500"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.21">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="2" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">default :</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="right"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="3" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="valign">
+                    <enum value="stretch"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)Default" ts="1278682281888" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropBoolean"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">default</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <composite-view id="33" display-name="ASP_Basics_Editor_Restrictions" ts="1279156309776" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>d0a97d01-1a1f-48b0-8e57-6946eca3aa07</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:ASPProperty"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="5" view="system:development_agents_customscriptagent.23">
+            <size width="60"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">hidden ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <config-override type="component.wcf.label:Root">
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+            </config-override>
+        </window>
+        <window id="6" view="system:development_agents_customscriptagent.23">
+            <size width="60"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">optional ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <config-override type="component.wcf.label:Root">
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+            </config-override>
+        </window>
+        <window id="7" view="system:development_agents_customscriptagent.23">
+            <size width="60"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">inline ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="column">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <config-override type="component.wcf.label:Root">
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+            </config-override>
+        </window>
+        <window id="8" view="system:development_agents_customscriptagent.23">
+            <size width="60"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">encrypted ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="column">
+                    <integer value="3"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <config-override type="component.wcf.label:Root">
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+            </config-override>
+        </window>
+        <window id="11" view="nested">
+            <size/>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)hidden" ts="1278679978763" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:ASPProperty"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">hidden</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="10" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i) Optional" ts="1278679939503" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:ASPProperty"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">canBeBlank</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="9" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="2"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)Inline" ts="1278679732563" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:ASPProperty"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">renderInline</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="12" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="3"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)encrypted" ts="1278680045516" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:ASPProperty"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">encrypted</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <composite-view id="34" display-name="ASP_Numeric_Editor_Restrictions" ts="1279156473258" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>e40c13e3-5add-4e26-b4a4-7505d4620595</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.23">
+            <size width="60"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Constraint Value &lt;= 0 ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="4" view="system:development_agents_customscriptagent.23">
+            <size width="60"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Constraint Value = 0 ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="5" view="system:development_agents_customscriptagent.23">
+            <size width="60"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Constraint Value >= 0 ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="column">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <config-override type="component.wcf.label:Root">
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+            </config-override>
+        </window>
+        <window id="6" view="system:development_agents_customscriptagent.23">
+            <size width="60"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Constraint Value &lt;> 0 ?</string>
+                </entry>
+            </context>
+            <config>
+                <property name="column">
+                    <integer value="3"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <config-override type="component.wcf.label:Root">
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+            </config-override>
+        </window>
+        <window id="11" view="nested">
+            <size/>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)&lt;=0" ts="1278680343680" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">ltEqualZero</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="12" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i==0" ts="1278680362099" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">equalZero</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="9" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="2"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)>=0" ts="1278680382469" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">gtEqualZero</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+        <window id="10" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="3"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="center"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i) &lt;>0" ts="1278680405085" public="false" component="wcf.bean-input.checkbox">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropNumeric"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="updatePolicy">
+                        <enum value="immediate"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">notEqualZero</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <view id="37" display-name="ASP_CreateEditor" ts="1279828537863" public="false" component="wcf.drop-down">
+        <uuid>dcb26469-5de3-4e7c-b692-fde81fa4c7cf</uuid>
+        <inputs>
+            <entry key="secondary" data-type="wcf:Boolean" usage="optional">
+                <boolean value="false"/>
+            </entry>
+            <entry key="asp" data-type="development_agents_customscriptagent:ASPObject" usage="optional">
+                <null-rv/>
+            </entry>
+            <entry key="name" data-type="wcf:String" usage="optional" implicit="true"/>
+        </inputs>
+        <generated-context output-key="selectedItem" custom-key="name"/>
+        <flow>
+            <on action="selection">
+                <update>
+                    <context>
+                        <entry key="asp">
+                            <function-rv id="system:development_agents_customscriptagent.36">
+                                <context-rv input-key="name"/>
+                            </function-rv>
+                        </entry>
+                    </context>
+                </update>
+            </on>
+        </flow>
+        <config>
+            <property name="items">
+                <function-rv id="system:development_agents_customscriptagent.35">
+                    <context-rv input-key="secondary"/>
+                </function-rv>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <view id="38" display-name="ASPCreateDLG" ts="1279828257099" public="false" component="wcf.wizard">
+        <uuid>150b5dca-7a50-4371-97ce-259d2fd1be0a</uuid>
+        <purpose name="dialog"/>
+        <inputs>
+            <entry key="asp" data-type="development_agents_customscriptagent:ASPObject" usage="internal">
+                <null-rv/>
+            </entry>
+            <entry key="included" data-type="development_agents_customscriptagent:ASPObject"/>
+            <entry key="selectedASP" data-type="development_agents_customscriptagent:ASPObject" usage="optional">
+                <null-rv/>
+            </entry>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="cards">
+                <list-value>
+                    <object>
+                        <property name="id">
+                            <string xml:space="preserve">change</string>
+                        </property>
+                        <property name="view">
+                            <view-ref value="system:development_agents_customscriptagent.43"/>
+                        </property>
+                        <property name="finishReaction">
+                            <previous update="context">
+                                <context>
+                                    <entry key="result">
+                                        <function-rv id="system:development_agents_customscriptagent.39">
+                                            <context-rv input-key="included"/>
+                                            <context-rv input-key="asp"/>
+                                        </function-rv>
+                                    </entry>
+                                    <entry key="selectedASP">
+                                        <context-rv input-key="asp"/>
+                                    </entry>
+                                </context>
+                            </previous>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="scrollbars">
+                <enum value="hidden"/>
+            </property>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="700"/>
+                    <height preferred="400"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                    <property name="usePreferredWidth">
+                        <boolean value="true"/>
+                    </property>
+                    <property name="usePreferredHeight">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <view id="42" display-name="add New Agent" ts="1279283205829" priority="p9" primary-input-key="container" component="wcf.input.text">
+        <uuid>0acdaaf8-af0d-4f7b-b43c-dddf04a9c3a4</uuid>
+        <purpose name="dialog"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="CISelector"/>
+        <inputs>
+            <entry key="container" data-type="foglight-5:IDE_CAR_ExportContainer"/>
+            <entry key="name" data-type="wcf:String" usage="optional" implicit="true"/>
+        </inputs>
+        <generated-context output-key="value" custom-key="name"/>
+        <flow>
+            <on action="update">
+                <previous update="context">
+                    <context>
+                        <entry key="result">
+                            <function-rv id="system:development_agents_customscriptagent.41">
+                                <context-rv input-key="name"/>
+                                <context-rv input-key="container" path="name"/>
+                            </function-rv>
+                        </entry>
+                    </context>
+                </previous>
+            </on>
+        </flow>
+        <config>
+            <property name="label">
+                <string xml:space="preserve">Please enter Agentname:</string>
+            </property>
+            <property name="applyButton">
+                <string xml:space="preserve">create</string>
+            </property>
+            <property name="fieldWidth">
+                <integer value="60"/>
+            </property>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="400"/>
+                    <height preferred="80"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                    <property name="usePreferredWidth">
+                        <boolean value="true"/>
+                    </property>
+                    <property name="usePreferredHeight">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <composite-view id="43" display-name="ASPEditor_CreateFrame" ts="1279828726316" public="false" component="wcf.grid2">
+        <uuid>5494241e-daf7-4977-ae7a-49dda6e1d7de</uuid>
+        <purpose name="pagelet"/>
+        <inputs>
+            <entry key="secondary" data-type="wcf:Boolean" usage="optional">
+                <boolean value="false"/>
+            </entry>
+            <entry key="asp" data-type="development_agents_customscriptagent:ASPObject" usage="optional">
+                <null-rv/>
+            </entry>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="0"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.37">
+            <size height="20"/>
+            <config>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+            </config>
+        </window>
+        <window id="1" view="nested">
+            <size/>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="stretch"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+                <property name="vweight">
+                    <integer value="1"/>
+                </property>
+                <property name="showTitle">
+                    <boolean value="true"/>
+                </property>
+                <property name="showBorder">
+                    <boolean value="true"/>
+                </property>
+            </config>
+            <view id="nested" display-name="nv)EditorFrame" ts="1279828469840" public="false" component="wcf.type">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:ASPObject"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="input">
+                        <context-rv input-key="asp"/>
+                    </property>
+                    <property name="selectorMode">
+                        <enum value="none"/>
+                    </property>
+                    <property name="viewsFilter">
+                        <object>
+                            <property name="showAllViews">
+                                <boolean value="false"/>
+                            </property>
+                            <property name="showPageViews">
+                                <boolean value="false"/>
+                            </property>
+                            <property name="showDialogViews">
+                                <boolean value="false"/>
+                            </property>
+                            <property name="showMenuViews">
+                                <boolean value="false"/>
+                            </property>
+                            <property name="showSummaryViews">
+                                <boolean value="false"/>
+                            </property>
+                            <property name="showCustomViews">
+                                <string xml:space="preserve">ASPEditorInner</string>
+                            </property>
+                        </object>
+                    </property>
+                    <property name="sizing">
+                        <component-sizing>
+                            <width preferred="0"/>
+                            <height preferred="0"/>
+                        </component-sizing>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <view id="45" display-name="xmlDisplay" ts="1285666820110" public="false" component="wcf.label">
+        <uuid>f2e3ab11-315d-4b71-8055-01cf047a3d42</uuid>
+        <purpose name="dialog"/>
+        <purpose name="pagelet"/>
+        <inputs>
+            <entry key="aspContainer" data-type="development_agents_customscriptagent:ASPContainer"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="label">
+                <context-rv input-key="aspContainer" path="xml" renderer-id="system:core_commons.249"/>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <composite-view id="48" display-name="ASP_SecondaryASPEditor" ts="1286188869772" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>ba99413f-b2eb-401b-a5b9-a016710c24cc</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="ASPEditorInner"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropSecondaryASP"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="500"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.21">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="2" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">size :</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="right"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="4" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="i)Size" ts="1286188834763" public="false" component="wcf.bean-input.drop-down">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropSecondaryASP"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="items">
+                        <function-rv id="system:development_agents_customscriptagent.44"/>
+                    </property>
+                    <property name="pathToValue">
+                        <string xml:space="preserve">size</string>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <composite-view id="49" display-name="ASP_EnumEditor" ts="1286190955007" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>b0e7cf13-b14a-40ab-9393-5e81a900c615</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="ASPEditorInner"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropEnum"/>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="500"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.21">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="2" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Values :</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="right"/>
+                </property>
+            </config>
+        </window>
+        <window id="3" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="stretch"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+                <property name="vweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="nv)Values" ts="1286190921189" public="false" component="wcf.table.row-table">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropEnum"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="rows">
+                        <context-rv input-key="asp" path="enums"/>
+                    </property>
+                    <property name="columns">
+                        <list-value>
+                            <object>
+                                <property name="value">
+                                    <context-rv input-key="currentRow" path="pos" renderer-id="system:wcf_common_ui_table.25"/>
+                                </property>
+                                <property name="id">
+                                    <string xml:space="preserve">c_0</string>
+                                </property>
+                                <property name="cellAlignment">
+                                    <object>
+                                        <property name="horizontal">
+                                            <enum value="right"/>
+                                        </property>
+                                    </object>
+                                </property>
+                            </object>
+                            <object>
+                                <property name="value">
+                                    <context-rv input-key="currentRow" path="id" renderer-id="system:wcf_common_ui_table.2"/>
+                                </property>
+                                <property name="id">
+                                    <string xml:space="preserve">id</string>
+                                </property>
+                                <property name="cellAlignment">
+                                    <object>
+                                        <property name="horizontal">
+                                            <enum value="left"/>
+                                        </property>
+                                    </object>
+                                </property>
+                                <property name="sortable">
+                                    <boolean value="false"/>
+                                </property>
+                            </object>
+                            <object>
+                                <property name="value">
+                                    <context-rv input-key="currentRow" path="label" renderer-id="system:wcf_common_ui_table.2"/>
+                                </property>
+                                <property name="id">
+                                    <string xml:space="preserve">value</string>
+                                </property>
+                                <property name="cellAlignment">
+                                    <object>
+                                        <property name="horizontal">
+                                            <enum value="left"/>
+                                        </property>
+                                    </object>
+                                </property>
+                                <property name="sortable">
+                                    <boolean value="false"/>
+                                </property>
+                            </object>
+                        </list-value>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <composite-view id="51" display-name="ASP_EnumASPEditor" ts="1286193240832" public="false" priority="low" primary-input-key="asp" component="wcf.grid2">
+        <uuid>cca9d108-dcef-491e-b558-d0ff69dbc3af</uuid>
+        <purpose name="pagelet"/>
+        <purpose name="dataView"/>
+        <custom-purpose name="ASPEditorInner"/>
+        <inputs>
+            <entry key="timeRange" data-type="wcf:TimeRange"/>
+            <entry key="asp" data-type="development_agents_customscriptagent:PropEnum" usage="optional">
+                <create-data-object-rv>
+                    <create-data-object type="development_agents_customscriptagent:PropEnum" storage="none"/>
+                </create-data-object-rv>
+            </entry>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="0"/>
+                    <height preferred="500"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="useLegacySizing">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+        <window id="0" view="system:development_agents_customscriptagent.21">
+            <size/>
+            <config>
+                <property name="colspan">
+                    <integer value="2"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="middle"/>
+                </property>
+            </config>
+        </window>
+        <window id="2" view="system:development_agents_customscriptagent.23">
+            <size width="120"/>
+            <context>
+                <entry key="lbl">
+                    <string xml:space="preserve">Values :
+</string>
+                </entry>
+            </context>
+            <config>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="right"/>
+                </property>
+            </config>
+        </window>
+        <window id="3" view="nested">
+            <size/>
+            <config>
+                <property name="column">
+                    <integer value="1"/>
+                </property>
+                <property name="row">
+                    <integer value="1"/>
+                </property>
+                <property name="align">
+                    <enum value="stretch"/>
+                </property>
+                <property name="valign">
+                    <enum value="stretch"/>
+                </property>
+                <property name="hweight">
+                    <integer value="1"/>
+                </property>
+                <property name="vweight">
+                    <integer value="1"/>
+                </property>
+            </config>
+            <view id="nested" display-name="nv) EnumValues" ts="1286193238691" public="false" component="wcf.table.row-table.bean-cell-input">
+                <inputs>
+                    <entry key="asp" data-type="development_agents_customscriptagent:PropEnum"/>
+                </inputs>
+                <flow/>
+                <config>
+                    <property name="rows">
+                        <context-rv input-key="asp" path="enums"/>
+                    </property>
+                    <property name="columns">
+                        <list-value>
+                            <object>
+                                <property name="path">
+                                    <string xml:space="preserve">pos</string>
+                                </property>
+                                <property name="id">
+                                    <string xml:space="preserve">c_0</string>
+                                </property>
+                                <property name="visible">
+                                    <boolean value="false"/>
+                                </property>
+                                <property name="header">
+                                    <string xml:space="preserve">Pos</string>
+                                </property>
+                            </object>
+                            <object>
+                                <property name="path">
+                                    <string xml:space="preserve">id</string>
+                                </property>
+                                <property name="id">
+                                    <string xml:space="preserve">c_1</string>
+                                </property>
+                                <property name="header">
+                                    <string xml:space="preserve">value</string>
+                                </property>
+                            </object>
+                            <object>
+                                <property name="path">
+                                    <string xml:space="preserve">label</string>
+                                </property>
+                                <property name="id">
+                                    <string xml:space="preserve">c_2</string>
+                                </property>
+                                <property name="header">
+                                    <string xml:space="preserve">Label</string>
+                                </property>
+                            </object>
+                        </list-value>
+                    </property>
+                    <property name="actionGroups">
+                        <list-value>
+                            <object>
+                                <property name="actions">
+                                    <list-value>
+                                        <object>
+                                            <property name="label">
+                                                <string xml:space="preserve">add</string>
+                                            </property>
+                                            <property name="reaction">
+                                                <update>
+                                                    <context>
+                                                        <entry key="asp">
+                                                            <function-rv id="system:development_agents_customscriptagent.50">
+                                                                <context-rv input-key="asp"/>
+                                                            </function-rv>
+                                                        </entry>
+                                                    </context>
+                                                </update>
+                                            </property>
+                                        </object>
+                                    </list-value>
+                                </property>
+                            </object>
+                        </list-value>
+                    </property>
+                </config>
+            </view>
+        </window>
+    </composite-view>
+    <view id="55" display-name="ASPTreeEditor" ts="1326293382556" public="false" component="wcf.table.tree-table">
+        <uuid>6ee605d0-7b93-417f-ac1f-4744f6c85a06</uuid>
+        <purpose name="page"/>
+        <purpose name="pagelet"/>
+        <purpose name="portlet"/>
+        <inputs>
+            <entry key="aspContainer" data-type="development_agents_customscriptagent:ASPContainer" usage="optional">
+                <function-rv id="system:development_agents_customscriptagent.11">
+                    <context-rv input-key="agent" path="aspDefinition"/>
+                </function-rv>
+            </entry>
+            <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+            <entry key="selectedASP" data-type="development_agents_customscriptagent:ASPObject" usage="optional" implicit="true"/>
+        </inputs>
+        <flow>
+            <on action="cellSelection">
+                <generated-context output-key="selectedNode" custom-key="selectedASP"/>
+                <generated-context output-key="selectedColumnId" custom-key="selColID"/>
+                <generated-context output-key="parentsOfSelectedNode" custom-key="pars"/>
+                <choose-value key="selColID">
+                    <case value="mUp">
+                        <update>
+                            <context>
+                                <entry key="results">
+                                    <function-rv id="system:development_agents_customscriptagent.29">
+                                        <context-rv input-key="pars" results-index="0">
+                                            <on-null>
+                                                <context-rv input-key="aspContainer"/>
+                                            </on-null>
+                                        </context-rv>
+                                        <context-rv input-key="selectedASP"/>
+                                        <integer value="-1"/>
+                                    </function-rv>
+                                </entry>
+                            </context>
+                        </update>
+                    </case>
+                    <case value="mDown">
+                        <update>
+                            <context>
+                                <entry key="result">
+                                    <function-rv id="system:development_agents_customscriptagent.29">
+                                        <context-rv input-key="pars" results-index="0">
+                                            <on-null>
+                                                <context-rv input-key="aspContainer"/>
+                                            </on-null>
+                                        </context-rv>
+                                        <context-rv input-key="selectedASP"/>
+                                        <integer value="1"/>
+                                    </function-rv>
+                                </entry>
+                            </context>
+                        </update>
+                    </case>
+                    <case value="remove">
+                        <update>
+                            <context>
+                                <entry key="result">
+                                    <function-rv id="system:development_agents_customscriptagent.32">
+                                        <context-rv input-key="pars" results-index="0">
+                                            <on-null>
+                                                <context-rv input-key="aspContainer"/>
+                                            </on-null>
+                                        </context-rv>
+                                        <context-rv input-key="selectedASP"/>
+                                    </function-rv>
+                                </entry>
+                            </context>
+                        </update>
+                    </case>
+                    <case value="add">
+                        <popup id="system:development_agents_customscriptagent.38">
+                            <context>
+                                <entry key="included">
+                                    <context-rv input-key="selectedASP"/>
+                                </entry>
+                            </context>
+                        </popup>
+                    </case>
+                    <case value="edit">
+                        <popup id="system:development_agents_customscriptagent.19" type="modal"/>
+                    </case>
+                    <default>
+                        <update>
+                            <context>
+                                <entry key="pars2">
+                                    <context-rv input-key="pars"/>
+                                </entry>
+                                <entry key="stefan">
+                                    <function-rv id="system:development_agents_customscriptagent.30">
+                                        <context-rv input-key="pars"/>
+                                    </function-rv>
+                                </entry>
+                            </context>
+                        </update>
+                    </default>
+                </choose-value>
+            </on>
+            <on action="nodeSelection">
+                <generated-context output-key="selectedNode" custom-key="selectedASP"/>
+                <generated-context output-key="selectedColumnId" custom-key="selColID"/>
+                <generated-context output-key="parentsOfSelectedNode" custom-key="pars"/>
+                <update/>
+            </on>
+        </flow>
+        <config>
+            <property name="root">
+                <context-rv input-key="aspContainer" path="aspGroups"/>
+            </property>
+            <property name="displayType">
+                <data-object-type datasource-type="development_agents_customscriptagent" data-type="ASPObject"/>
+            </property>
+            <property name="dataTypeChildren">
+                <list-value>
+                    <object>
+                        <property name="type">
+                            <data-object-type datasource-type="development_agents_customscriptagent" data-type="ASPGroup"/>
+                        </property>
+                        <property name="explicitChildren">
+                            <context-rv input-key="explicitChildrenCurrentNode" path="properties"/>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="type">
+                            <data-object-type datasource-type="development_agents_customscriptagent" data-type="PropSecondaryASP"/>
+                        </property>
+                        <property name="explicitChildren">
+                            <context-rv input-key="explicitChildrenCurrentNode" path="cols"/>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="childrenNodeAutoDiscoveryLegacy">
+                <boolean value="true"/>
+            </property>
+            <property name="columns">
+                <list-value>
+                    <object>
+                        <property name="value">
+                            <context-rv input-key="currentNode" path="id"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">ID</string>
+                        </property>
+                        <property name="header">
+                            <string xml:space="preserve">ID</string>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <context-rv input-key="currentNode" path="label"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">label</string>
+                        </property>
+                        <property name="header">
+                            <string xml:space="preserve">Label</string>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <context-rv input-key="currentNode" return-type="localizedTypeName"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">type</string>
+                        </property>
+                        <property name="header">
+                            <string xml:space="preserve">Property Type</string>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <icon-rv id="system:utiliconset.4"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">mUp</string>
+                        </property>
+                        <property name="header">
+                            <string-rv>
+                                <value xml:space="preserve"> </value>
+                            </string-rv>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <icon-rv id="system:utiliconset.1"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">mDown</string>
+                        </property>
+                        <property name="header">
+                            <string-rv>
+                                <value xml:space="preserve"> </value>
+                            </string-rv>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <function-rv id="system:development_agents_customscriptagent.31">
+                                <context-rv input-key="currentNode"/>
+                                <icon-ref value="system:system.40"/>
+                            </function-rv>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">add</string>
+                        </property>
+                        <property name="header">
+                            <string-rv>
+                                <value xml:space="preserve"> </value>
+                            </string-rv>
+                        </property>
+                        <property name="nullRenderer">
+                            <null-renderer value="system:core_commons.192"/>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <icon-rv id="system:system.76"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">remove</string>
+                        </property>
+                        <property name="header">
+                            <string-rv>
+                                <value xml:space="preserve"> </value>
+                            </string-rv>
+                        </property>
+                        <property name="width">
+                            <object>
+                                <property name="sizing">
+                                    <enum value="specified"/>
+                                </property>
+                                <property name="value">
+                                    <integer value="10"/>
+                                </property>
+                                <property name="unit">
+                                    <enum value="em"/>
+                                </property>
+                            </object>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <icon-rv id="system:system.103"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">edit</string>
+                        </property>
+                        <property name="header">
+                            <string-rv>
+                                <value xml:space="preserve"> </value>
+                            </string-rv>
+                        </property>
+                        <property name="width">
+                            <object>
+                                <property name="sizing">
+                                    <enum value="specified"/>
+                                </property>
+                                <property name="value">
+                                    <integer value="10"/>
+                                </property>
+                                <property name="unit">
+                                    <enum value="em"/>
+                                </property>
+                            </object>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="selectionConfiguration">
+                <object>
+                    <property name="showRadiobuttons">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+            <property name="actionGroups">
+                <list-value>
+                    <object>
+                        <property name="actions">
+                            <list-value>
+                                <object>
+                                    <property name="icon">
+                                        <icon-ref value="system:system.40"/>
+                                    </property>
+                                    <property name="label">
+                                        <string xml:space="preserve">add Group</string>
+                                    </property>
+                                    <property name="reaction">
+                                        <popup id="system:development_agents_customscriptagent.16" type="modal">
+                                            <context>
+                                                <entry key="container">
+                                                    <context-rv input-key="aspContainer"/>
+                                                </entry>
+                                            </context>
+                                        </popup>
+                                    </property>
+                                </object>
+                            </list-value>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="title">
+                <string-rv>
+                    <value xml:space="preserve">ASPs defined for {0} (Agent)</value>
+                    <context-rv input-key="agent" path="name"/>
+                </string-rv>
+            </property>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="800" minimum="400"/>
+                    <height preferred="600" minimum="400"/>
+                </component-sizing>
+            </property>
+        </config>
+    </view>
+    <view id="57" display-name="ASPTreeEditorDlg" ts="1326293429347" public="false" component="wcf.form">
+        <uuid>38e85409-5b32-4589-b775-f450c09d86a3</uuid>
+        <purpose name="dialog"/>
+        <purpose name="page"/>
+        <inputs>
+            <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+            <entry key="aspContainer" data-type="development_agents_customscriptagent:ASPContainer" usage="internal">
+                <function-rv id="system:development_agents_customscriptagent.11">
+                    <context-rv input-key="agent" path="aspDefinition"/>
+                </function-rv>
+            </entry>
+        </inputs>
+        <flow/>
+        <config>
+            <property name="view">
+                <view-ref value="system:development_agents_customscriptagent.55"/>
+            </property>
+            <property name="actions">
+                <list-value>
+                    <object>
+                        <property name="text">
+                            <string xml:space="preserve">save</string>
+                        </property>
+                        <property name="reaction">
+                            <previous update="context">
+                                <context>
+                                    <entry key="agent">
+                                        <function-rv id="system:development_agents_customscriptagent.28">
+                                            <context-rv input-key="agent"/>
+                                            <context-rv input-key="aspContainer"/>
+                                        </function-rv>
+                                    </entry>
+                                </context>
+                            </previous>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="sizing">
+                <component-sizing>
+                    <width preferred="800" minimum="400"/>
+                    <height preferred="400" minimum="200"/>
+                </component-sizing>
+            </property>
+            <property name="popupOptions">
+                <object>
+                    <property name="maximumWidth">
+                        <integer value="1024"/>
+                    </property>
+                    <property name="allowMaximize">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+        </config>
+    </view>
+    <view id="58" display-name="ASPTreeView" ts="1326293000166" public="false" component="wcf.table.tree-table">
+        <uuid>18a095e3-dafe-48b9-942e-adb55fc50412</uuid>
+        <purpose name="page"/>
+        <purpose name="pagelet"/>
+        <purpose name="portlet"/>
+        <inputs>
+            <entry key="aspContainer" data-type="development_agents_customscriptagent:ASPContainer" usage="optional">
+                <function-rv id="system:development_agents_customscriptagent.11">
+                    <context-rv input-key="agent" path="aspDefinition"/>
+                </function-rv>
+            </entry>
+            <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
+            <entry key="selectedASP" data-type="development_agents_customscriptagent:ASPObject" usage="optional" implicit="true"/>
+        </inputs>
+        <flow>
+            <on action="cellSelection">
+                <generated-context output-key="selectedNode" custom-key="selectedASP"/>
+                <generated-context output-key="selectedColumnId" custom-key="selColID"/>
+                <generated-context output-key="parentsOfSelectedNode" custom-key="pars"/>
+                <choose-value key="selColID">
+                    <default>
+                        <update>
+                            <context>
+                                <entry key="pars2">
+                                    <context-rv input-key="pars"/>
+                                </entry>
+                                <entry key="stefan">
+                                    <function-rv id="system:development_agents_customscriptagent.30">
+                                        <context-rv input-key="pars"/>
+                                    </function-rv>
+                                </entry>
+                            </context>
+                        </update>
+                    </default>
+                </choose-value>
+            </on>
+            <on action="nodeSelection">
+                <generated-context output-key="selectedNode" custom-key="selectedASP"/>
+                <generated-context output-key="selectedColumnId" custom-key="selColID"/>
+                <generated-context output-key="parentsOfSelectedNode" custom-key="pars"/>
+                <update/>
+            </on>
+        </flow>
+        <config>
+            <property name="root">
+                <context-rv input-key="aspContainer" path="aspGroups"/>
+            </property>
+            <property name="displayType">
+                <data-object-type datasource-type="development_agents_customscriptagent" data-type="ASPObject"/>
+            </property>
+            <property name="dataTypeChildren">
+                <list-value>
+                    <object>
+                        <property name="type">
+                            <data-object-type datasource-type="development_agents_customscriptagent" data-type="ASPGroup"/>
+                        </property>
+                        <property name="explicitChildren">
+                            <context-rv input-key="explicitChildrenCurrentNode" path="properties"/>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="type">
+                            <data-object-type datasource-type="development_agents_customscriptagent" data-type="PropSecondaryASP"/>
+                        </property>
+                        <property name="explicitChildren">
+                            <context-rv input-key="explicitChildrenCurrentNode" path="cols"/>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="childrenNodeAutoDiscoveryLegacy">
+                <boolean value="true"/>
+            </property>
+            <property name="columns">
+                <list-value>
+                    <object>
+                        <property name="value">
+                            <context-rv input-key="currentNode" path="id"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">ID</string>
+                        </property>
+                        <property name="header">
+                            <string xml:space="preserve">ID</string>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <context-rv input-key="currentNode" path="label"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">label</string>
+                        </property>
+                        <property name="header">
+                            <string xml:space="preserve">Label</string>
+                        </property>
+                    </object>
+                    <object>
+                        <property name="value">
+                            <context-rv input-key="currentNode" return-type="localizedTypeName"/>
+                        </property>
+                        <property name="id">
+                            <string xml:space="preserve">type</string>
+                        </property>
+                        <property name="header">
+                            <string xml:space="preserve">Property Type</string>
+                        </property>
+                    </object>
+                </list-value>
+            </property>
+            <property name="selectionConfiguration">
+                <object>
+                    <property name="showRadiobuttons">
+                        <boolean value="true"/>
+                    </property>
+                </object>
+            </property>
+            <property name="title">
+                <string-rv>
+                    <value xml:space="preserve">ASPs defined for {0} (Agent)</value>
+                    <context-rv input-key="agent" path="name"/>
+                </string-rv>
+            </property>
+        </config>
+    </view>
+    <script-function type="groovy" id="2" display-name="saveFile" ts="1278425119988" public="false" output-type="wcf:Object" cache-results="true">
+        <uuid>af246309-7f20-4be3-a01d-c50b84f9a571</uuid>
+        <inputs>
+            <input name="file" type-name="wcf:Object"/>
+            <input name="path" type-name="wcf:String"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="6" display-name="saveContent" ts="1278427923764" public="false" output-type="wcf:Object" cache-results="true">
+        <uuid>158e8b01-7a6f-4aaa-818c-8e87b0e4a0a4</uuid>
+        <inputs>
+            <input name="agent" type-name="foglight-5:IDE_CustomScriptagent"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="9" display-name="ChangeAgentName" ts="1278432793525" public="false" output-type="foglight-5:IDE_CustomScriptagent" cache-results="true">
+        <uuid>ee4d3e9a-fbc2-4e08-8075-ffa8d331f252</uuid>
+        <inputs>
+            <input name="agent" type-name="foglight-5:IDE_CustomScriptagent"/>
+            <input name="newName" type-name="wcf:String"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="10" display-name="ChangeCMDName" ts="1278434074412" public="false" output-type="foglight-5:IDE_CustomScriptagent" cache-results="true">
+        <uuid>0cd4b12a-2a20-44ad-88ba-a003b84ee08b</uuid>
+        <inputs>
+            <input name="agent" type-name="foglight-5:IDE_CustomScriptagent"/>
+            <input name="cmd" type-name="wcf:String"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="11" display-name="unmarshalASP" ts="1279162341715" public="false" output-type="development_agents_customscriptagent:ASPContainer" cache-results="true">
+        <uuid>567a2ee2-46bb-4419-a382-64237880dcde</uuid>
+        <inputs>
+            <input name="xmlText" type-name="wcf:String"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="13" display-name="addASPGroup" ts="1278537989786" output-type="wcf:String">
+        <uuid>0b929922-e303-4eb8-8391-d14d71927c3d</uuid>
+        <inputs>
+            <input name="container" type-name="development_agents_customscriptagent:ASPContainer"/>
+            <input name="group" type-name="development_agents_customscriptagent:ASPGroup"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="28" display-name="storeAsps" ts="1279043155148" public="false" output-type="foglight-5:IDE_CustomScriptagent" cache-results="true">
+        <uuid>a8d16288-73e2-49a1-9c5a-4e43a516e6f2</uuid>
+        <inputs>
+            <input name="agent" type-name="foglight-5:IDE_CustomScriptagent"/>
+            <input name="container" type-name="development_agents_customscriptagent:ASPContainer"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="29" display-name="moveChild" ts="1279053973813" public="false" output-type="wcf:Object" cache-results="true">
+        <uuid>bbd03373-e2a4-43c8-9107-174a1aca973b</uuid>
+        <inputs>
+            <input name="parent" type-name="wcf:DataObject"/>
+            <input name="child" type-name="development_agents_customscriptagent:ASPObject"/>
+            <input name="direction" type-name="wcf:Integer"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="30" display-name="debug" ts="1279053642949" public="false" output-type="wcf:Object" cache-results="true">
+        <uuid>30ccb791-0aae-462d-9da9-8031e766d8a8</uuid>
+        <inputs>
+            <input name="objs" type-name="wcf:DataObject" list="true"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="31" display-name="displayIfParentIsExtensible" ts="1279054086413" public="false" output-type="wcf:IconReference" cache-results="true">
+        <uuid>702270fd-b175-47ee-8886-294af58337dd</uuid>
+        <inputs>
+            <input name="parent" type-name="development_agents_customscriptagent:ASPObject"/>
+            <input name="ico" type-name="wcf:IconReference"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="32" display-name="removeChild" ts="1279155721942" public="false" output-type="wcf:Object" cache-results="true">
+        <uuid>faf39543-784c-43f1-9544-278ab601d06a</uuid>
+        <inputs>
+            <input name="parent" type-name="wcf:DataObject"/>
+            <input name="child" type-name="development_agents_customscriptagent:ASPObject"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="35" display-name="getTypenames" ts="1279158761152" public="false" output-type="wcf:String" output-list="true" cache-results="true">
+        <uuid>88fbb930-7ddb-497a-9274-9d52c8cda4c5</uuid>
+        <inputs>
+            <input name="secondary" type-name="wcf:Boolean"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="36" display-name="createASP" ts="1279158785799" public="false" output-type="development_agents_customscriptagent:ASPObject" cache-results="true">
+        <uuid>c063b2a7-9042-4945-bda9-a413353af323</uuid>
+        <inputs>
+            <input name="typeName" type-name="wcf:String"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="39" display-name="addChild" ts="1279158904035" public="false" output-type="development_agents_customscriptagent:ASPObject" cache-results="true">
+        <uuid>16e18c63-d5ad-4c01-84e6-0e2a8a0f33a5</uuid>
+        <inputs>
+            <input name="parent" type-name="wcf:DataObject"/>
+            <input name="child" type-name="development_agents_customscriptagent:ASPObject"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="41" display-name="createAgent" ts="1286186935187" public="false" output-type="wcf:Object" cache-results="true">
+        <uuid>315462af-72c9-4a2c-923f-c8f44ccca20a</uuid>
+        <inputs>
+            <input name="name" type-name="wcf:String"/>
+            <input name="containerName" type-name="wcf:String"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="44" display-name="getStringSizes" ts="1280320766178" public="false" output-type="wcf:Integer" output-list="true" cache-results="true">
+        <uuid>7d76874c-a141-43af-8942-e97d3722a26d</uuid>
+    </script-function>
+    <script-function type="groovy" id="46" display-name="validateEmpty" ts="1295386975033" public="false" output-type="wcf:StatusMessage" output-list="true" cache-results="true">
+        <uuid>9b512539-3b9a-4a10-b142-9a1762df8a78</uuid>
+        <inputs>
+            <input name="val" type-name="wcf:Object"/>
+            <input name="name" type-name="wcf:String"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="47" display-name="validateId" ts="1285754957877" public="false" output-type="wcf:StatusMessage" output-list="true" cache-results="true">
+        <uuid>06cceb2b-d40a-42f8-9923-2fbd2d093250</uuid>
+        <inputs>
+            <input name="val" type-name="wcf:String"/>
+            <input name="name" type-name="wcf:String"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="50" display-name="enumAddLine" ts="1286191765180" public="false" output-type="development_agents_customscriptagent:PropEnum" cache-results="true">
+        <uuid>a7382bf5-fb03-423b-889e-89a178be532c</uuid>
+        <inputs>
+            <input name="target" type-name="development_agents_customscriptagent:PropEnum"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="52" display-name="enumDeleteLine" ts="1286193059500" public="false" output-type="development_agents_customscriptagent:PropEnum" cache-results="true">
+        <uuid>6a65e6c6-c5e8-4dc6-86bb-e8385222d407</uuid>
+        <inputs>
+            <input name="target" type-name="development_agents_customscriptagent:PropEnum"/>
+            <input name="line" type-name="development_agents_customscriptagent:EnumValue"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="53" display-name="validateInt" ts="1308365087338" public="false" output-type="wcf:StatusMessage" output-list="true" cache-results="true">
+        <uuid>a0fdbcc2-15a7-489c-8df2-10c11839fba6</uuid>
+        <inputs>
+            <input name="name" type-name="wcf:String"/>
+            <input name="val" type-name="wcf:Number"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="54" display-name="validateFloat" ts="1295386748883" public="false" output-type="wcf:StatusMessage" output-list="true" cache-results="true">
+        <uuid>cc9d7784-aec8-447c-a625-d5584cfb0719</uuid>
+        <inputs>
+            <input name="name" type-name="wcf:String"/>
+            <input name="val" type-name="wcf:Number"/>
+        </inputs>
+    </script-function>
+    <script-function type="groovy" id="56" display-name="simpleXMlPrettyPrint" ts="1326291800064" public="false" output-type="wcf:String" cache-results="true">
+        <uuid>7cf61383-9f13-43ee-856e-8f3557c8fa9c</uuid>
+        <inputs>
+            <input name="xmlString" type-name="wcf:String"/>
+        </inputs>
+    </script-function>
+    <type-mapping datasource-type="foglight-5" data-type="IDE_CustomScriptagent" ts="1278587129835">
+        <icon id="system:utiliconset.11"/>
+        <flow tag="drilldown">
+            <next-page id="system:development_agents_customscriptagent.5">
+                <context>
+                    <entry key="agent">
+                        <context-rv input-key="IDE_CustomScriptagent"/>
+                    </entry>
+                </context>
+            </next-page>
+        </flow>
+        <flow tag="edit">
+            <next-page id="system:development_agents_customscriptagent.5">
+                <context>
+                    <entry key="agent">
+                        <context-rv input-key="IDE_CustomScriptagent"/>
+                    </entry>
+                </context>
+            </next-page>
+        </flow>
+    </type-mapping>
+</module>

@@ -1,0 +1,6 @@
+<topologytypes name="@@AGENT_NAME@@-TopologyTypes" author="${cartridge.author}" version="${cartridge.version}"  file="${basedir}/src/agents/@@AGENT_NAME@@/xml/topology-types.xml"/>
+<cdt name="@@AGENT_NAME@@-CDT" adapter="SPI" author="${cartridge.author}" version="${cartridge.version}">
+	<binding type="@@AGENT_NAME@@" filename="cdt.xml"/>
+	<fileset file="${basedir}/src/agents/@@AGENT_NAME@@/xml/cdt.xml" />
+</cdt>
+<monitoringpolicy name="@@AGENT_NAME@@-MonitoringPolicy" author="${cartridge.author}" version="${cartridge.version}" file="${basedir}/build/agents/@@AGENT_NAME@@/xml/monitoring-policy.xml" />

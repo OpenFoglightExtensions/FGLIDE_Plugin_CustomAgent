@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE types PUBLIC "types" "topology-types.dtd" >
+<types>
+
+
+	<type extends="IDE_Delegated_CI" name="IDE_CustomScriptagent">
+		<property name="name" type="String" is-identity="true" />
+
+		<property name="typeNameAgent" type="String"></property>
+		<property name="typeNameTable" type="String"></property>
+		<property name="typeNameTableDataPrefix" type="String"></property>
+
+		<property name="command" type="String" ></property>
+
+		<property name="aspDefinition" type="String" ></property>
+
+		<!-- File Contents -->
+		<property name="agentPackages" type="IDE_CA_AgentFiles" is-containment="true" is-many="true"/>
+		
+		
+				<property is-many="false" name="expToCar" type="Object">
+			<annotation name='DerivationExprType' value='Script' />
+			<annotation name='DerivationExpression'>
+				<value><![CDATA[
+// Imports
+import org.apache.commons.io.FileUtils;
+import com.quest.common.util.*;
+import com.quest.nitro.service.cartridge.api.*
+
+// START CL
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import org.jibx.runtime.*
+import com.quest.nitro.service.cartridge.api.*
+import org.apache.commons.io.FileUtils;
+import org.jboss.mx.util.MBeanServerLocator;
+import com.quest.nitro.service.sl.jibx.FoglightConfiguration;
+
+
+
+def cl = {dir,car,version,msg->
+	def agentName = scope.name
+def author = scope.controller.controller.getString("author")
+	msg << "Exporting Agent :"+scope.name+"\n"
+	
+	
+	// Export Files !!
+	msg<<"Creating SRC Files !!! \n"
+	
+	
+	// retrieve Templates dir
+	def templatesDir = fglide_getCartridgeStateDir("CustomAgentPlugin")
+	def templates = templatesDir.list().find{it.contains("Templates")}
+	templatesDir = new File(templatesDir,templates)
+	
+	def agentname = scope.name
+	
+	def xmlDir = new File(dir,"/src/agents/$agentname/xml")
+	xmlDir.mkdirs();
+	
+	// write XML Definition
+	new File(xmlDir,"/asp_definition.xml").withWriter{ it << scope.aspDefinition }
+	
+	// write CDT
+	def cdtText = new File(templatesDir,"cdt.tmpl").text
+			.replace("@@TYPE_AGENT@@",scope.typeNameAgent)
+			.replace("@@TYPE_TABLE@@",scope.typeNameTable)
+			.replace("@@TYPE_TABLE_PREFIX@@",scope.typeNameTableDataPrefix)
+	new File(xmlDir,"/cdt.xml").withWriter{ it << cdtText }
+
+        cdtText = new File(templatesDir,"cdt-binding.tmpl").text
+			.replace("@@AGENT_NAME@@",scope.name)
+	new File(xmlDir,"/cdt-binding.xml").withWriter{ it << cdtText }
+	
+	def typesText = new File(templatesDir,"topology-types.tmpl").text
+			.replace("@@TYPE_AGENT@@",scope.typeNameAgent)
+			.replace("@@TYPE_TABLE@@",scope.typeNameTable)
+	new File(xmlDir,"/topology-types.xml").withWriter{ it << typesText }
+	
+	msg << fglide_CA_exportASP(dir.getAbsolutePath(),scope.aspDefinition,agentname,scope.command)
+	msg << "\n"
+	
+	scope.agentPackages.each{installer ->
+		def output = new File(dir,"/build/agents/${scope.name}/installer/${installer.name}")
+		output.mkdirs()
+		
+		msg << "Creating installer for package $installer.name ... ($output)\n"
+		
+		// TODO
+		def spidDeploy = new File(output,"/spid/5.2.4/deploy")
+		spidDeploy.mkdirs()
+		
+		output = new File(output,"/$scope.name/$version/")
+		output.mkdirs()
+		
+		
+		
+		["bin","export","lib","logs","messages","mof","World","script","config/$scope.name"].each {
+			new File(output,"/$it").mkdirs()
+			new File(output,"/$it/placeholder.file").withWriter{wrt->wrt<<"PLACEHOLDER"}
+		}
+		
+		// copy Defs and Config File
+		def configDir = new File(output,"/config/$scope.name")
+		CommonFileUtil.copyFile(new File(dir,"build/agents/${scope.name}/xml/ConfigDefs.xml"),new File(configDir,"ConfigDefs.xml"))
+		
+		// write Config Files
+		
+		msg << "Generate Installer Files for Agent " + agentName+"\n"
+		def f = new File(spidDeploy,"${agentName}BasePkg.xml")
+		f.withWriter { wrt -> wrt << """\
+<?xml version="1.0" encoding="UTF-8"?>
+<BasePackage:package xmlns:BasePackage="http://www.quest.com/xml/ns/spi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.quest.com/xml/ns/spi ../../xml/ns/spi/BasePackage.xsd" contact="Foglight Core" version="1.0" displayName="Base Package" name="BasePkg" description="Instrumentation Base Package">
+    <plugins>
+        <plugin uses="JCollector" name="$agentName" loglevel="info" activate="true" plugin="com.quest.spi.support.collector.CollectorAgent" pluginName="$agentName">
+            <properties>
+                <property name="Home" description="Home directory">../../$agentName/$version</property>
+                <property name="XMLfileName" description="Package for definitions">config/${agentName}/${agentName}Manifest.xml</property>
+                <property name="enableDynamicData" description="Flag to generate dynamic table"></property>
+                <property name="frequencyProperty" description="Flag to calculate frequency setting from ASP">${agentName}/sample_freq?row=5</property>
+            </properties>
+        </plugin>
+    </plugins>
+</BasePackage:package>
+			""" }
+		
+		
+		f = new File(configDir,"${agentName}LogDefs.xml")
+		def logName = '#instance#.log'
+		
+		f.withWriter { wrt -> wrt << """\
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns:Log="http://www.quest.com/xml/ns/spi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+				xsi:schemaLocation="http://www.quest.com/xml/ns/spi/Logs.xsd" contact="Foglight Group" 
+				version="1.0" displayName="Log4j definitions" name="LogDefs" description="Log4j definitions" 
+			fileName="${agentName}LogDefs.xml">
+    <properties>
+        <property name="appender.LogLevel" desc="appender log threshold">INFO</property>
+        <property name="appender.Name" desc="appender name"></property>
+        <property name="appender.Class" desc="appender class type">org.apache.log4j.DailyRollingFileAppender</property>
+        <property name="appender.File" desc="appender log file name">logs/$logName</property>
+        <property name="appender.MaxFileSize" desc="appender file max. size(KB)">1000</property>
+        <property name="appender.MaxBackupIndex" desc="appender file max. count">7</property>
+        <property name="appender.FilePattern" desc="Daily rolling appender type">daily</property>
+        <property name="appender.ConversionPattern" desc="appender line pattern">%d{ABSOLUTE} %-5p [%t]: %m%n</property>
+    </properties>
+</package>"""}
+		
+		f = new File(configDir,"${agentName}Manifest.xml")
+		f.withWriter { wrt -> wrt << """\
+<?xml version="1.0" encoding="UTF-8"?>
+<Manifest:package xmlns:Manifest="http://www.quest.com/xml/ns/spi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+					xsi:schemaLocation="http://www.quest.com/xml/ns/spi/Manifest.xsd" 
+			contact="Foglight Group" version="1.0" displayName="Manifest" filename="${agentName}Manifest.xml" name="Manifest" description="Manifest">
+    <Properties/>
+    <connection connectionName="ConfigDefs">
+        <properties>
+            <property name="XMLfileName" description="Package for configuration definitions">ConfigDefs.xml</property>
+        </properties>
+    </connection>
+    <connection connectionName="ProcedureDefs">
+        <properties>
+            <property name="XMLfileName" description="Package for procedure definitions">${agentName}ProcedureDefs.xml</property>
+        </properties>
+    </connection>
+    <connection connectionName="LogDefs">
+        <properties>
+            <property name="XMLfileName" description="Package for Logging definitions">${agentName}LogDefs.xml</property>
+        </properties>
+    </connection>
+</Manifest:package>"""}
+		
+		f = new File(configDir,"${agentName}ProcedureDefs.xml")
+		f.withWriter { wrt -> wrt << """\
+			<?xml version="1.0" encoding="UTF-8"?>
+			<Procedure:package xmlns:Procedure="http://www.quest.com/xml/ns/spi" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+					xsi:schemaLocation="http://www.quest.com/xml/ns/spi/Procedure.xsd" contact="Foglight Group" 
+					version="1.0" displayName="Procedure definitions" name="ProcedureDefs" 
+					description="Procedure definitions for the Type1_NT_Script package" 
+					fileName="${agentName}ProcedureDefs.xml"/>
+			"""}
+         // Copy Scripts !!!
+         
+        def scriptPath = new File(output,"script")
+	CommonFileUtil.copyDirectory(new File(installer.localPath),scriptPath)
+        msg << "Scripts copied to ... $scriptPath \n"
+        
+       // Zip Installer
+def from = new File(dir,"/build/agents/${scope.name}/installer/${installer.name}").absolutePath
+new File(dir,"/build/agents/installers").mkdirs()
+def to = new File(dir,"/build/agents/installers/${agentName}_${installer.name}_installer_${version}.spar").absolutePath
+msg << "Create SPAR in $to ($from)\n"
+createZipTool().zipDirectory(from,to)
+
+        //add to Cartridge
+        new File(dir,"build/tmp/").mkdirs()
+        def installerXML = new File(dir,"build/tmp/installers.xml");
+installerXML.withWriter{wrt->
+wrt << """<?xml version="1.0" encoding="UTF-8"?>
+<installers>
+    <installer name="${agentName}_Installer_${installer.name}" version="$version" filename="${agentName}_${installer.name}_installer_${version}.spar" type="spid-client-pkg"/>
+</installers>
+"""}
+
+msg.append("Adding Installer to Cartridge !!!\n")
+def component = new Component(new Identity("${agentName}_Installer_${installer.name}", version, author),
+"Installers");
+
+CartFile cartFile = CartFile.create("installers.xml",installerXML);	
+component.getItems().add(cartFile);
+
+CartFile cartFileInstaller = CartFile.create("${agentName}_${installer.name}_installer_${version}.spar", new File(to));
+component.getItems().add(cartFileInstaller)
+
+component.setDeploymentItem(cartFile);
+
+car.getComponentList().add(component);
+
+
+
+	} // end Installers !!!
+
+// add CDT and Policies
+msg << "Add CDT and Policies to Cartridge .\n"
+// Add CDT
+def component = new Component(new Identity("${agentName}_CDT", version, author),
+"CDT");
+
+CartFile cdtBindingFile = CartFile.create("cdt-binding.xml",new File(dir,"/src/agents/$agentName/xml/cdt-binding.xml"));	
+component.getItems().add(cdtBindingFile);
+
+CartFile cdtFile = CartFile.create("cdt.xml",new File(dir,"/src/agents/$agentName/xml/cdt.xml"));	
+
+component.getItems().add(cdtFile)
+
+component.setDeploymentItem(cdtBindingFile);
+car.getComponentList().add(component);
+
+// Add Topology
+
+component = new Component(new Identity("${agentName}-TopologyTypes", version, author),
+				"Topology Types");
+cartFile = CartFile.create("topology-types.xml",new File(xmlDir,"/topology-types.xml"));	
+component.getItems().add(cartFile);
+component.setDeploymentItem(cartFile);
+car.getComponentList().add(component);
+
+// Add MP
+component = new Component(new Identity("${agentName}-MonitoringPolicys", version, author),
+				"Monitoring Policy");
+cartFile = CartFile.create("monitoring-policy.xml",new File(dir,"/build/agents/$agentName/xml/monitoring-policy.xml"));	
+component.getItems().add(cartFile);
+component.setDeploymentItem(cartFile);
+car.getComponentList().add(component);
+
+}
+// END CL
+	return cl
+	
+				]]>
+				</value>
+			</annotation>
+			<annotation name='DerivationTimeout' value='0' />
+		</property>
+		<property is-many="false" name="expToProject" type="Object">
+			<annotation name='DerivationExprType' value='Script' />
+			<annotation name='DerivationExpression'>
+				<value><![CDATA[
+import com.quest.common.util.*
+def cl = {dir,car,version,msg->
+
+
+msg.append ("Exporting Data Structure : "+scope.name+"\n")
+
+
+// retrieve Templates dir
+def templatesDir = fglide_getCartridgeStateDir("CustomAgentPlugin")
+def templates = templatesDir.list().find{it.contains("Templates")}
+templatesDir = new File(templatesDir,templates)
+
+def agentname = scope.name
+def xmlDir = new File(dir,"/src/agents/$agentname/xml")
+xmlDir.mkdirs();
+
+// write XML Definition
+new File(xmlDir,"/asp_definition.xml").withWriter{ it << scope.aspDefinition }
+
+// write CDT
+def cdtText = new File(templatesDir,"cdt.tmpl").text
+                 .replace("@@TYPE_AGENT@@",scope.typeNameAgent)
+                 .replace("@@TYPE_TABLE@@",scope.typeNameTable)
+                 .replace("@@TYPE_TABLE_PREFIX@@",scope.typeNameTableDataPrefix)
+new File(xmlDir,"/cdt.xml").withWriter{ it << cdtText }
+
+def typesText = new File(templatesDir,"topology-types.tmpl").text
+                 .replace("@@TYPE_AGENT@@",scope.typeNameAgent)
+                 .replace("@@TYPE_TABLE@@",scope.typeNameTable)
+new File(xmlDir,"/topology-types.xml").withWriter{ it << typesText }
+
+//
+// ADD CAR TASK ELEMENTS 
+//
+				
+msg.append ("--> Basic config done - continue with Packages. \n")
+
+def packageBuildSnippets = new StringBuffer()
+
+    def taskText = new File(templatesDir,"build_task.tmpl").text
+                 .replace("@@AGENT_NAME@@",scope.name)
+
+     car["task"].append(taskText+"\n")
+
+scope.agentPackages.each{p-> 
+    msg.append ("--> Package $p.name \n")
+    // copy Scripts
+    def scriptDir = new File(dir,"/src/agents/$agentname/$p.name/scripts")
+    scriptDir.mkdirs();
+
+    def srcDir = new File(p.localPath)
+    CommonFileUtil.copyDirectory(srcDir,scriptDir)
+
+    def packageBuildText = new File(templatesDir,"build_packages.tmpl").text
+                 .replace("@@PACKAGE_NAME@@",p.name)
+
+    packageBuildSnippets.append("\n")
+    packageBuildSnippets.append(packageBuildText)
+ 
+    car["task"].append('''
+	<installers name="'''+"${scope.name}_Installer_${p.name}"+'''" version="${cartridge.version}">
+        	<installer name="'''+"${scope.name}_Installer_${p.name}"+'''" 
+                           type="spid-client-pkg" version="${cartridge.version}" file="${basedir}/build/agents/installers/'''+"${scope.name}_${p.name}"+'''_installer_${cartridge.version}.spar" />
+	</installers>
+    ''')
+}				
+
+    def buildText = new File(templatesDir,"build_snippet.tmpl").text
+                 .replace("@@AGENT_NAME@@",scope.name)
+                 .replace("@@CMD_LINE@@",scope.command)
+                 .replace("@@PACKAGES@@",packageBuildSnippets.toString())
+
+    car["additional"].append(buildText)
+    car["prepare"].append(""" 
+		<antcall target="_create_Agent_Installer_$scope.name" /> 
+	""")	
+}
+	return cl
+	
+				]]>
+				</value>
+			</annotation>
+			<annotation name='DerivationTimeout' value='0' />
+		</property>
+		
+	</type>
+
+	
+
+	<type name="IDE_CA_AgentFiles" extends="TopologyObject">
+		<property name="agentDefinition" type="IDE_CustomScriptagent" is-identity="true"/>
+		<property name="name" type="String" is-identity="true" />
+		
+		<property  name="localPath" type="String">
+			<annotation name='DerivationExprType' value='Script' />
+			<annotation name='DerivationExpression'>
+				<value><![CDATA[
+def f = new File("state"+File.separator+"fglide"+File.separator+"agents"+File.separator+scope.agentDefinition.name+File.separator+scope.name);
+return f.absolutePath
+				]]>
+				</value>
+			</annotation>
+
+		</property>
+	
+		<property is-many="true" name="files" type="IDE_File">
+			<annotation name='DerivationExprType' value='Script' />
+			<annotation name='DerivationExpression'>
+				<value><![CDATA[
+def f = new File(scope.localPath);
+	
+					// make sure the Path exists
+					f.mkdirs()
+
+					def files = f.list().collect{it}
+
+					def fileList = files.collect{
+					def fileType = server.TopologyService.getType("IDE_File")
+					def obj =	server.TopologyService.createAnonymousDataObject(fileType)
+					obj.set("filename",it);
+					def file = new File(f,it)
+					obj.set("date", new Date(file.lastModified()))
+					obj.set("size",file.length())
+					obj.set("fullPath",file.absolutePath)
+
+					return obj
+					}	
+					
+					
+					
+					return fileList
+					]]>
+				</value>
+			</annotation>
+<annotation name='DerivationTimeout' value='100' />
+		</property>
+
+	</type>
+	
+
+</types>
