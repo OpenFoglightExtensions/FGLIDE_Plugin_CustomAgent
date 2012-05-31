@@ -590,7 +590,7 @@ The Agent will execute the Scrip &lt;b>{4}&lt;/b></value>
             </property>
         </config>
     </view>
-    <composite-view id="12" display-name="ASPEditor" ts="1326293106159" public="false" component="wcf.grid2">
+    <composite-view id="12" display-name="ASPEditor" ts="1338461722163" public="false" component="wcf.grid2">
         <uuid>93a7662f-7495-4c2e-95a2-1ee596bfa2e7</uuid>
         <purpose name="dialog"/>
         <purpose name="page"/>
@@ -624,7 +624,7 @@ The Agent will execute the Scrip &lt;b>{4}&lt;/b></value>
                     <integer value="1"/>
                 </property>
             </config>
-            <view id="nested" display-name="nv)Toolbar" ts="1326293106130" public="false" component="wcf.toolbar">
+            <view id="nested" display-name="nv)Toolbar" ts="1338461582400" public="false" component="wcf.toolbar">
                 <inputs>
                     <entry key="agent" data-type="foglight-5:IDE_CustomScriptagent"/>
                 </inputs>
@@ -671,6 +671,13 @@ The Agent will execute the Scrip &lt;b>{4}&lt;/b></value>
         </window>
         <window id="3" view="system:development_agents_customscriptagent.58">
             <size/>
+            <context>
+                <entry key="aspContainer">
+                    <function-rv id="system:development_agents_customscriptagent.11">
+                        <context-rv input-key="agent" path="aspDefinition"/>
+                    </function-rv>
+                </entry>
+            </context>
             <config>
                 <property name="row">
                     <integer value="1"/>
@@ -3586,7 +3593,7 @@ The Agent will execute the Scrip &lt;b>{4}&lt;/b></value>
             <input name="agent" type-name="foglight-5:IDE_CustomScriptagent"/>
         </inputs>
     </script-function>
-    <script-function type="groovy" id="9" display-name="ChangeAgentName" ts="1278432793525" public="false" output-type="foglight-5:IDE_CustomScriptagent" cache-results="true">
+    <script-function type="groovy" id="9" display-name="ChangeAgentName" ts="1338462202026" public="false" output-type="foglight-5:IDE_CustomScriptagent" cache-results="true">
         <uuid>ee4d3e9a-fbc2-4e08-8075-ffa8d331f252</uuid>
         <inputs>
             <input name="agent" type-name="foglight-5:IDE_CustomScriptagent"/>
@@ -3667,7 +3674,7 @@ The Agent will execute the Scrip &lt;b>{4}&lt;/b></value>
             <input name="child" type-name="development_agents_customscriptagent:ASPObject"/>
         </inputs>
     </script-function>
-    <script-function type="groovy" id="41" display-name="createAgent" ts="1286186935187" public="false" output-type="wcf:Object" cache-results="true">
+    <script-function type="groovy" id="41" display-name="createAgent" ts="1338462192092" public="false" output-type="wcf:Object" cache-results="true">
         <uuid>315462af-72c9-4a2c-923f-c8f44ccca20a</uuid>
         <inputs>
             <input name="name" type-name="wcf:String"/>
