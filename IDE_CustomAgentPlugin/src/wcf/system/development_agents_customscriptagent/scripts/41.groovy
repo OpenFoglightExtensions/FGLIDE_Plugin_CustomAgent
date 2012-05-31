@@ -1,3 +1,4 @@
+package system._development_agents_customscriptagent.scripts;
 def CDATASTART="![CDATA["
 def CDATAEND = "]]"
 
@@ -21,9 +22,9 @@ def xml = """
             <objectProperty name='parent'>
               <objectReference refId='1' />
             </objectProperty>
-            <stringProperty name='typeNameAgent'><${CDATASTART}${name}${CDATAEND}></stringProperty>
-            <stringProperty name='typeNameTable'><${CDATASTART}${name}_Table${CDATAEND}></stringProperty>
-            <stringProperty name='typeNameTableDataPrefix'><${CDATASTART}${name}_Data_${CDATAEND}></stringProperty>
+            <stringProperty name='typeNameAgent'><${CDATASTART}${name}_Agent${CDATAEND}></stringProperty>
+            <stringProperty name='typeNameTable'><${CDATASTART}${name}_Agent_Table${CDATAEND}></stringProperty>
+            <stringProperty name='typeNameTableDataPrefix'><${CDATASTART}${name}_Agent_Table_${CDATAEND}></stringProperty>
 <stringProperty name='aspDefinition'><${CDATASTART}<properties></properties>${CDATAEND}></stringProperty>
             <!--<stringProperty name='command'><${CDATASTART}${name}.cmd${CDATAEND}></stringProperty>-->
               <objectProperty name='agentPackages'>
